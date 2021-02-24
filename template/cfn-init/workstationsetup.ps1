@@ -1,0 +1,272 @@
+# Copyright (c) 2020 Teradici Corporation
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+[CmdletBinding()]
+param(
+  [Parameter(Mandatory=$True,Position=1)]
+  [string]$WorkstationConf
+)
+
+if (-not (Test-Path $WorkstationConf))
+{
+    Throw "File '$WorkstationConf' does not exist, exiting script"
+}
+
+$content = Get-Content $WorkstationConf
+
+$LOG_FILE = "C:\Teradici\provisioning.log"
+$PCOIP_AGENT_LOCATION_URL = $content[0]
+$PCOIP_AGENT_FILENAME = ""
+$pcoip_registration_code = $content[1]
+$admin_password = $content[2]
+$ad_service_account_password = $content[3]
+$domainname = $content[4]
+$adServiceAccountUsername = $content[5]
+
+$global:restart = $false
+
+# Retry function, defaults to trying for 5 minutes with 10 seconds intervals
+function Retry ([scriptblock]$Action,$Interval = 10,$Attempts = 30) {
+  $Current_Attempt = 0
+
+  while ($true) {
+    $Current_Attempt++
+    $rc = $Action.Invoke()
+
+    if ($?) { return $rc }
+
+    if ($Current_Attempt -ge $Attempts) {
+      Write-Error "Failed after $Current_Attempt attempt(s)." -InformationAction Continue
+      throw
+    }
+
+    Write-Information "Attempt $Attempt failed. Retry in $Interval seconds..." -InformationAction Continue
+    Start-Sleep -Seconds $Interval
+  }
+}
+
+function PCoIP-Agent-is-Installed {
+  Get-Service "PCoIPAgent"
+  return $?
+}
+
+function PCoIP-Agent-Install {
+  "################################################################"
+  "Install PCoIP Agent"
+  "################################################################"
+  if (PCoIP-Agent-is-Installed) {
+    "PCoIP Agent already installed."
+    return
+  }
+
+  $agentInstallerDLDirectory = "C:\Teradici"
+  if (![string]::IsNullOrEmpty($PCOIP_AGENT_FILENAME)) {
+    "Using user-specified PCoIP Agent filename..."
+    $agent_filename = $PCOIP_AGENT_FILENAME
+  } else {
+    "Using default latest PCoIP Agent..."
+    $agent_latest = $PCOIP_AGENT_LOCATION_URL + "latest-graphics-agent.json"
+    $wc = New-Object System.Net.WebClient
+
+    "Checking for the latest PCoIP Agent version from $agent_latest..."
+    $string = Retry -Action { $wc.DownloadString($agent_latest) }
+
+    $agent_filename = $string | ConvertFrom-Json | Select-Object -ExpandProperty "filename"
+  }
+  $pcoipAgentInstallerUrl = $PCOIP_AGENT_LOCATION_URL + $agent_filename
+  $destFile = $agentInstallerDLDirectory + '\' + $agent_filename
+  $wc = New-Object System.Net.WebClient
+
+  "Downloading PCoIP Agent from $pcoipAgentInstallerUrl..."
+  Retry -Action { $wc.DownloadFile($pcoipAgentInstallerUrl,$destFile) }
+  "Teradici PCoIP Agent downloaded: $agent_filename"
+
+  "Installing agent..."
+  Start-Process -FilePath $destFile -ArgumentList "/S /nopostreboot _?$destFile" -Passthru -Wait
+
+  if (!(PCoIP-Agent-is-Installed)) {
+    "ERROR: Failed to install PCoIP Agent"
+    exit 1
+  }
+
+  "Teradici PCoIP Agent installed successfully"
+  $global:restart = $true
+}
+
+function PCoIP-Agent-Register {
+  "################################################################"
+  "Register PCoIP Agent"
+  "################################################################"
+  Set-Location 'C:\Program Files\Teradici\PCoIP Agent'
+
+  "Checking for existing PCoIP License..."
+  & .\pcoip-validate-license.ps1
+  if ($LastExitCode -eq 0) {
+    "Valid license found."
+    return
+  }
+
+  # License regisration may have intermittent failures
+  $Interval = 10
+  $Timeout = 600
+  $Elapsed = 0
+
+  do {
+    $Retry = $false
+    & .\pcoip-register-host.ps1 -RegistrationCode $pcoip_registration_code
+    # the script already produces error message
+
+    if ($LastExitCode -ne 0) {
+      if ($Elapsed -ge $Timeout) {
+        "Failed to register PCoIP Agent."
+        exit 1
+      }
+
+      "Retrying in $Interval seconds... (Timeout in $($Timeout-$Elapsed) seconds)"
+      $Retry = $true
+      Start-Sleep -Seconds $Interval
+      $Elapsed += $Interval
+    }
+  } while ($Retry)
+
+  "PCoIP Agent Registered Successfully"
+}
+
+function Join-Domain {
+  "################################################################"
+  "Join Domain"
+  "################################################################"
+  $obj = Get-WmiObject -Class Win32_ComputerSystem
+
+  if ($obj.PartOfDomain) {
+    if ($obj.Domain -ne "$domainname") {
+      "ERROR: Trying to join '$domainname' but computer is already joined to '$obj.Domain'"
+      exit 1
+    }
+
+    "Computer already part of the '$obj.Domain' domain."
+    return
+  }
+
+  "Computer not part of a domain. Joining $domainname..."
+
+  $username = "$adServiceAccountUsername" + "@" + "$domainname"
+  $password = ConvertTo-SecureString $ad_service_account_password -AsPlainText -Force
+  $cred = New-Object System.Management.Automation.PSCredential ($username,$password)
+
+  # Read "Name" tag for hostname
+  $instance_id = Get-EC2InstanceMetadata -Category "InstanceId"
+  $hname = hostname
+  $host_name = $hname + "-" + $instance_id
+
+  # Looping in case Domain Controller is not yet available
+  $Interval = 10
+  $Timeout = 1200
+  $Elapsed = 0 
+
+  do {
+    try {
+      $Retry = $false
+      # Don't do -Restart here because there is no log showing the restart
+      Add-Computer -DomainName $domainname -Credential $cred -Verbose -Force -ErrorAction Stop
+    }
+
+    # The same Error, System.InvalidOperationException, is thrown in these cases:
+    # - when Domain Controller not reachable (retry waiting for DC to come up)
+    # - when password is incorrect (retry because user might not be added yet)
+    # - when computer is already in domain
+    catch [System.InvalidOperationException]{
+      $PSItem
+
+      # Sometimes domain join is successful but renaming the computer fails
+      if ($PSItem.FullyQualifiedErrorId -match "FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand") {
+        Retry -Action { Rename-Computer -NewName "$host_name" -DomainCredential $cred }
+        break
+      }
+
+      if ($PSItem.FullyQualifiedErrorId -match "AddComputerToSameDomain,Microsoft.PowerShell.Commands.AddComputerCommand") {
+        "WARNING: Computer already joined to domain."
+        break
+      }
+
+      if ($Elapsed -ge $Timeout) {
+        "Timeout reached, exiting ..."
+        exit 1
+      }
+
+      "Retrying in $Interval seconds... (Timeout in $($Timeout-$Elapsed) seconds)"
+      $Retry = $true
+      Start-Sleep -Seconds $Interval
+      $Elapsed += $Interval
+    }
+    catch {
+      $PSItem
+      exit 1
+    }
+  } while ($Retry)
+
+  $obj = Get-WmiObject -Class Win32_ComputerSystem
+  if (!($obj.PartOfDomain) -or ($obj.Domain -ne "$domainname")) {
+    "ERROR: failed to join '$domainname'"
+    exit 1
+  }
+
+  "Successfully joined '$domainname'"
+  $global:restart = $false
+}
+
+
+if (Test-Path $LOG_FILE) {
+  Start-Transcript -Path $LOG_FILE -Append -IncludeInvocationHeader
+
+  "$LOG_FILE exists. Assume this startup script has run already."
+
+  # TODO: Find out why DNS entry is not always added after domain join.
+  # Sometimes the DNS entry for this workstation is not added in the Domain
+  # Controller after joining the domain. Explicitly adding this machine to the DNS
+  # after a reboot. Doing this before a reboot would add a DNS entry with the old
+  # hostname.
+  "Registering with DNS..."
+  do {
+    Start-Sleep -Seconds 5
+    Register-DnsClient
+  } while (!$?)
+  "Successfully registered with DNS."
+
+  exit 0
+}
+
+Start-Transcript -Path $LOG_FILE -Append -IncludeInvocationHeader
+
+"let Cluster calm down, sleeping 2 minutes"
+Start-Sleep -s 120
+
+"Script running as user '$(whoami)'"
+
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())
+if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  "Running as Administrator"
+} else {
+  "Not running as Administrator"
+}
+
+"Changing Administrator Password"
+net user Administrator $admin_password /active:yes
+
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
+#PCoIP-Agent-Install
+
+#PCoIP-Agent-Register
+
+Join-Domain
+
+"Adding domain users to remote desktop users"
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Domain Users"
+Add-LocalGroupmember -Group "Administrators" -Member "Domain Users"
+
+"Restarting Workstation"
+Restart-Computer -Force
+
