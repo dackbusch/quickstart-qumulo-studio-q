@@ -1,0 +1,308 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This template instantiates a Windows Domain Controller in the private subnet and configures active directory and DNS
+
+Parameters:
+  RootURL:
+    Type: String
+  testusername:
+    Type: String
+  testuserpassword:
+    Type: String
+    NoEcho: "True"
+  DirectoryServerAmi:
+    Type: String
+  DirectoryServerKeyName:
+    Type: String
+  DirectoryServerSG:
+    Type: String
+  DirectoryServerSubnet:
+    Type: String
+  DirectoryServerVPC:
+    Type: String
+  adServiceAccountPassword:
+    Type: String
+    NoEcho: "True"
+  adServiceAccountUsername:
+    Type: String
+  dcAdminPassword:
+    Type: String
+    NoEcho: "true"
+  dcInstanceType:
+    Type: String
+  domainName:
+    Type: String
+  DomainNetBIOSName:
+    Type: String
+  safeModeAdminPassword:
+    Type: String
+    NoEcho: "true"
+  floatIPs:
+    Type: String
+  recordName:
+    Type: String
+
+Conditions:
+  KeyNameDefined: !Not
+    - "Fn::Equals":
+        - !Ref DirectoryServerKeyName
+        - ""
+
+Resources:
+  DomainControllerWaitHandle:
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+
+  S3AccessRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
+                    - "/*"
+  DomainControllerWaitCondition:
+    Type: "AWS::CloudFormation::WaitCondition"
+    DependsOn:
+      - DomainController
+    Properties:
+      Handle: !Ref DomainControllerWaitHandle
+      Timeout: "7200"
+
+  S3AccessProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: /
+      Roles:
+        - !Ref S3AccessRole
+
+  DomainController:
+    Type: "AWS::EC2::Instance"
+    Metadata:
+      "AWS::CloudFormation::Authentication":
+        rolebased:
+          buckets:
+            - qumuloadobe
+          roleName: !Ref S3AccessRole
+          type: S3
+      "AWS::CloudFormation::Init":
+        "1-setup":
+          files:
+            "C:\\cfn\\cfn-hup.conf":
+              authentication: rolebased
+              context:
+                Region: !Ref "AWS::Region"
+                StackId: !Ref "AWS::StackId"
+              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
+            "C:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
+              authentication: rolebased
+              context:
+                Region: !Ref "AWS::Region"
+                ResourceName: DomainController
+                StackId: !Ref "AWS::StackId"
+              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
+            "C:\\cfn\\install\\CleanupFiles.cmd":
+              content: !Sub |
+                del /f /q c:\cfn\\install\local-admin-password.conf
+                del /f /q c:\cfn\\install\domain-info.conf
+                del /f /q c:\cfn\\install\svcaccount.conf
+                del /f /q c:\cfn\\install\user.conf
+                del /f /q c:\cfn\\install\arecord-info.conf
+            "C:\\cfn\\install\\add-svcaccount.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/add-svcaccount.ps1"]]
+            "C:\\cfn\\install\\change-administrator-password.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/change-administrator-password.ps1"]]
+            "C:\\cfn\\install\\create-user.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/create-user.ps1"]]
+            "C:\\cfn\\install\\configure-network.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/configure-dc-network.ps1"]]
+            "C:\\cfn\\install\\dc-promo.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/dc-promo.ps1"]]
+            "C:\\cfn\\install\\create-arecords.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/create-arecords.ps1"]]
+            "C:\\cfn\\install\\local-admin-password.conf":
+              authentication: rolebased
+              context:
+                AdministratorPassword: !Ref dcAdminPassword
+              source: !Join ["/", [!Ref RootURL, "cfn-init/local-admin-password.conf"]]
+            "C:\\cfn\\install\\user.conf":
+              authentication: rolebased
+              context:
+                domainusername: !Ref testusername
+                domainpassword: !Ref testuserpassword
+              source: !Join ["/", [!Ref RootURL, "cfn-init/user.conf"]]
+            "C:\\cfn\\install\\rename-computer.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/rename-computer.ps1"]]
+            "C:\\cfn\\install\\svcaccount.conf":
+              authentication: rolebased
+              context:
+                SvcAccountPassword: !Ref adServiceAccountPassword
+                SvcAccountUserName: !Ref adServiceAccountUsername
+              source: !Join ["/", [!Ref RootURL, "cfn-init/svcaccount.conf"]]
+            "C:\\cfn\\install\\wait-dc-services-ready.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/wait-dc-services-ready.ps1"]]
+            "c:\\cfn\\install\\domain-info.conf":
+              authentication: rolebased
+              context:
+                DomainDNSName: !Ref domainName
+                DomainNetBIOSName: !Ref DomainNetBIOSName
+                RestoreModePassword: !Ref safeModeAdminPassword
+              source: !Join ["/", [!Ref RootURL, "cfn-init/domain-info.conf"]]
+            "c:\\cfn\\install\\arecord-info.conf":
+              authentication: rolebased
+              context:
+                ARecordName: !Ref recordName
+                ZoneName: !Ref domainName
+                TTL: "00:00:00"
+                IP0: !Select [0, !Split [", ", !Ref floatIPs]]
+                IP1: !Select [1, !Split [", ", !Ref floatIPs]]
+                IP2: !Select [2, !Split [", ", !Ref floatIPs]]
+                IP3: !Select [3, !Split [", ", !Ref floatIPs]]
+                IP4: !Select [4, !Split [", ", !Ref floatIPs]]
+                IP5: !Select [5, !Split [", ", !Ref floatIPs]]
+                IP6: !Select [6, !Split [", ", !Ref floatIPs]]
+                IP7: !Select [7, !Split [", ", !Ref floatIPs]]
+                IP8: !Select [8, !Split [", ", !Ref floatIPs]]
+                IP9: !Select [9, !Split [", ", !Ref floatIPs]]
+                IP10: !Select [10, !Split [", ", !Ref floatIPs]]
+                IP11: !Select [11, !Split [", ", !Ref floatIPs]]
+              source: !Join ["/", [!Ref RootURL, "cfn-init/arecord-info.conf"]]
+          services:
+            windows:
+              cfn-hup:
+                enabled: "true"
+                ensureRunning: "true"
+                files:
+                  - "c:\\cfn\\cfn-hup.conf"
+                  - "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
+        "2-run":
+          commands:
+            "01-change-password":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\change-administrator-password.ps1 -PasswordFile c:\\cfn\\install\\local-admin-password.conf"
+              waitAfterCompletion: "0"
+            "02-configure-network":
+              command: !Join
+                - ""
+                - - "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\configure-network.ps1 -DomainDNSName "
+                  - !Ref domainName
+                  - " -InterfaceNewName Private"
+              waitAfterCompletion: "0"
+            "03-rename-computer":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\rename-computer.ps1 -ComputerName dc"
+              waitAfterCompletion: forever
+            "04-run-dcpromo":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\dc-promo.ps1 -ConfigFile c:\\cfn\\install\\domain-info.conf"
+              waitAfterCompletion: forever
+            "05-wait-reboot":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\wait-dc-services-ready.ps1"
+              waitAfterCompletion: "60"
+            "06-add-svcaccount":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\add-svcaccount.ps1 -PasswordFile c:\\cfn\\install\\svcaccount.conf"
+              waitAfterCompletion: "10"
+            "07-add-domainuser":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\create-user.ps1 -UserFile c:\\cfn\\install\\user.conf"
+              waitAfterCompletion: "20"
+            "08-add-arecords":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\create-arecords.ps1 -ConfigFile c:\\cfn\\install\\arecord-info.conf"
+              waitAfterCompletion: "60"
+            "09-cleanup-files":
+              command: "C:\\cfn\\install\\CleanupFiles.cmd"
+              waitAfterCompletion: "0"
+            "10-signal-success":
+              command: !Join
+                - ""
+                - - "cfn-signal.exe -e 0 \""
+                  - "Fn::Base64": !Ref DomainControllerWaitHandle
+                  - "\""
+              waitAfterCompletion: "0"
+        configSets:
+          config:
+            - "1-setup"
+            - "2-run"
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+      IamInstanceProfile: !Ref S3AccessProfile
+      ImageId: !Ref DirectoryServerAmi
+      InstanceType: !Ref dcInstanceType
+      KeyName: !If
+        - KeyNameDefined
+        - !Ref DirectoryServerKeyName
+        - !Ref "AWS::NoValue"
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeviceIndex: "0"
+          GroupSet:
+            - !Ref DirectoryServerSG
+          SubnetId: !Ref DirectoryServerSubnet
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref "AWS::StackName"
+              - " - Domain Controller"
+      UserData: !Base64
+        "Fn::Sub": |
+          <script>
+            cfn-init.exe -v -c config --stack ${AWS::StackName} --resource DomainController --region ${AWS::Region}
+          </script>
+
+  VPCDHCPOptions:
+    Type: "AWS::EC2::DHCPOptions"
+    DependsOn:
+      - DomainController
+    Properties:
+      DomainName: !Ref domainName
+      DomainNameServers:
+        - "Fn::GetAtt": DomainController.PrivateIp
+      NetbiosNameServers:
+        - "Fn::GetAtt": DomainController.PrivateIp
+      NetbiosNodeType: 2
+      NtpServers:
+        - "Fn::GetAtt": DomainController.PrivateIp
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref "AWS::StackName"
+
+  VPCDHCPOptionsAssoc:
+    Type: "AWS::EC2::VPCDHCPOptionsAssociation"
+    DependsOn:
+      - DomainControllerWaitCondition
+    Properties:
+      DhcpOptionsId: !Ref VPCDHCPOptions
+      VpcId: !Ref DirectoryServerVPC
+
+Outputs:
+  DirectoryServerHostname:
+    Value: !GetAtt DomainController.PublicDnsName
+
+  DirectoryserverPrivateIP:
+    Value: !GetAtt DomainController.PrivateIp

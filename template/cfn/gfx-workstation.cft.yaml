@@ -1,0 +1,349 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template instantiates an EC2 instance with Teradici installed and a prompt to install Adobe Premier Pro via Adobe Creative Cloud
+Parameters:
+  FirstStation:
+    Type: String
+  WorkstationNumber:
+    Type: String
+  RootURL:
+    Type: String
+  pcoipRegistrationCode:
+    Type: String
+  domainName:
+    Type: String
+  adServiceAccountUsername:
+    Type: String
+  adServiceAccountPassword:
+    Type: String
+    NoEcho: "True"
+  gfxworkstationSubnet:
+    Type: String
+  gfxworkstationSG:
+    Type: String
+  gfxworkstationKeyName:
+    Type: String
+  windowsGfxInstanceAMI:
+    Type: String
+  windowsGrxInstanceType:
+    Type: String
+  workstationAdminPassword:
+    Type: String
+    NoEcho: "True"
+  pcoipAgentLocationUrl:
+    Type: String
+  pcoipAgentFilename:
+    Type: String
+  SMBShareName:
+    Type: String
+  FloatDNSName:
+    Type: String
+  DomainControllerSecretsName:
+    Type: String
+
+Conditions:
+  FirstWS: !Equals
+    - !Ref FirstStation
+    - "TRUE"
+
+Resources:
+
+  WorkstationEIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+
+  AssociateEIP:
+    Type: "AWS::EC2::EIPAssociation"
+    Properties:
+      AllocationId: !GetAtt WorkstationEIP.AllocationId
+      NetworkInterfaceId: !Ref WorkstationNI
+
+  WorkstationNI:
+    Type: "AWS::EC2::NetworkInterface"
+    Properties:
+      SubnetId: !Ref gfxworkstationSubnet
+      GroupSet:
+        -  !Ref gfxworkstationSG
+
+  WorkstationS3AccessRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: WorkstationS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
+                    - "/*"
+  WorkstationS3AccessProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: /
+      Roles:
+        - !Ref WorkstationS3AccessRole
+
+  windowsGfxWorkstation:
+    Type: 'AWS::EC2::Instance'
+    Metadata:
+      "AWS::CloudFormation::Authentication":
+        rolebased:
+          buckets:
+            - qumuloadobe
+          roleName: !Ref WorkstationS3AccessRole
+          type: S3
+
+      "AWS::CloudFormation::Init":
+        configSets:
+          config:
+            - "1-setup"
+            - "2-run"
+        "1-setup":
+          files:
+            "C:\\cfn\\cfn-hup.conf":
+              authentication: rolebased
+              context:
+                Region: !Ref "AWS::Region"
+                StackId: !Ref "AWS::StackId"
+              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
+            "C:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
+              authentication: rolebased
+              context:
+                Region: !Ref "AWS::Region"
+                ResourceName: windowsGfxWorkstation
+                StackId: !Ref "AWS::StackId"
+              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
+            "C:\\cfn\\install\\CleanupFiles.cmd":
+              content: !Sub |
+                del /f /q c:\cfn\\install\workstation.conf              
+            "C:\\cfn\\install\\workstation.conf":
+              authentication: rolebased
+              context:
+                pcoipAgentLocationUrl: !Ref pcoipAgentLocationUrl
+                pcoipRegistrationCode: !Ref pcoipRegistrationCode
+                workstationAdminPassword: !Ref workstationAdminPassword
+                adServiceAccountPassword: !Ref adServiceAccountPassword
+                domainName: !Ref domainName
+                adServiceAccountUsername: !Ref adServiceAccountUsername
+              source: !Join ["/", [!Ref RootURL, "cfn-init/workstation.conf"]]
+            "C:\\cfn\\install\\workstationsetup.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
+            "C:\\mapdrive.ps1":
+              content: !Sub |
+                New-PSDrive -Name Q -PSProvider FileSystem -Root "\\${FloatDNSName}\${SMBShareName}" -Scope Global -Persist
+            "C:\\cfn\\install\\install-chrome.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/install-chrome.ps1"]]
+            "C:\\cfn\\install\\launch-adobe.ps1":
+              content: !Sub |
+                Start-Process -FilePath "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "https://creativecloud.adobe.com"
+            "C:\\cfn\\install\\defender-exclude.ps1":
+              authentication: rolebased
+              source: !Join ["/", [!Ref RootURL, "cfn-init/defender-exclude.ps1"]]
+          services:
+            windows:
+              cfn-hup:
+                enabled: "true"
+                ensureRunning: "true"
+                files:
+                  - "c:\\cfn\\cfn-hup.conf"
+                  - "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
+        "2-run":
+          commands:
+            "01-setup-workstation":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\workstationsetup.ps1 -WorkstationConf c:\\cfn\\install\\workstation.conf"
+              waitAfterCompletion: "forever"
+            "02-configure-task-map-drive":
+              command: !Join 
+                - ""
+                - - "schtasks /create /tn \"Map Q Drive\" /ru \""
+                  - !Ref domainName
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File c:\\mapdrive.ps1\""
+              waitAfterCompletion: 0
+            "03-install-chrome":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\install-chrome.ps1"
+              waitAfterCompletion: 10
+            "04-configure-task-launch-adobe":
+              command: !Join 
+                - ""
+                - - "schtasks /create /tn \"Launch Adobe Webpage\" /ru \""
+                  - !Ref domainName
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File c:\\cfn\\install\\launch-adobe.ps1\""
+              waitAfterCompletion: 0
+            "05-configure-task-map-drive":
+              command: !Join 
+                - ""
+                - - "schtasks /create /tn \"Exclude Defender Q:\\ Drive\" /ru \""
+                  - "System\" /sc ONLOGON /tr \"powershell.exe -Command Start-Process PowerShell -ArgumentList \"-File c:\\cfn\\install\\defender-exclude.ps1\""
+            "06-cleanup-files":
+              command: "C:\\cfn\\install\\CleanupFiles.cmd"
+              waitAfterCompletion: 0
+
+    Properties:
+      ImageId: !Ref windowsGfxInstanceAMI
+      InstanceType: !Ref windowsGrxInstanceType
+      Monitoring: false
+      IamInstanceProfile: !Ref WorkstationS3AccessProfile
+      NetworkInterfaces:
+        - NetworkInterfaceId: !Ref WorkstationNI
+          DeviceIndex: 0
+      KeyName: !Ref gfxworkstationKeyName
+      Tags:
+        - Key: Name
+          Value: !If
+            - FirstWS
+            - !Sub "${AWS::StackName}- Windows Adobe Workstation #${WorkstationNumber}"
+            - !Join
+              - "-"
+              - - !Select [0, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [2, !Split ["-", !Ref "AWS::StackName"]]
+                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"
+
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          cfn-init.exe -v -c config --stack ${AWS::StackName} --resource windowsGfxWorkstation --region ${AWS::Region}
+          cfn-signal.exe -e $lastexitcode --stack ${AWS::StackName} --resource windowsGfxWorkstation --region ${AWS::Region}
+          </powershell>
+
+  domainNameSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-domainName"       
+      Value: !Ref domainName
+      Type: String
+
+  gfxworkstationKeyNameSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-gfxworkstationKeyName"       
+      Value: !Ref gfxworkstationKeyName
+      Type: String
+
+  gfxworkstationSGSSM:
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS 
+    Properties:
+      Name: !Sub "${AWS::StackName}-gfxworkstationSG"      
+      Value: !Ref gfxworkstationSG
+      Type: String
+
+  gfxworkstationSubnetSSM:
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS 
+    Properties:
+      Name: !Sub "${AWS::StackName}-gfxworkstationSubnet"     
+      Value: !Ref gfxworkstationSubnet
+      Type: String
+
+  pcoipAgentFilenameSSM:
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS 
+    Properties:
+      Name: !Sub "${AWS::StackName}-pcoipAgentFilename"     
+      Value: !Ref pcoipAgentFilename
+      Type: String
+
+  pcoipAgentLocationUrlSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-pcoipAgentLocationUrl"      
+      Value: !Ref pcoipAgentLocationUrl
+      Type: String
+
+  pcoipRegistrationCodeSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-pcoipRegistrationCode"       
+      Value: !Ref pcoipRegistrationCode
+      Type: String
+
+  windowsGfxInstanceAMISSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-windowsGfxInstanceAMI"       
+      Value: !Ref windowsGfxInstanceAMI
+      Type: String
+
+  windowsGrxInstanceTypeSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-windowsGrxInstanceType"        
+      Value: !Ref windowsGrxInstanceType
+      Type: String
+
+  SMBShareNameSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-SMBShareName"     
+      Value: !Ref SMBShareName
+      Type: String
+
+  FloatDNSNameSSM:
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-FloatDNSName"        
+      Value: !Ref FloatDNSName
+      Type: String
+
+  DomainControllerSecretsNameSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-DomainControllerSecretsName"
+      Value: !Ref DomainControllerSecretsName
+      Type: String
+
+  RootURLSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-RootURL"
+      Value: !Ref RootURL
+      Type: String
+
+Outputs:
+  GFXWorkstationHostname:
+    Description: "The public dns hostname of the Workstation Instance"
+    Value: !GetAtt windowsGfxWorkstation.PublicDnsName
+
+  GFXWorkstationPublicIP:
+    Description: "The Public IP Address of the Workstation Instance"
+    Value: !GetAtt windowsGfxWorkstation.PublicIp
+
+  GFXWorkstationNumber:
+    Description: "Workstation Instance Number"
+    Value: !Ref WorkstationNumber
+
+  GFXWorkstationStackName:
+    Description: The Name of this AWS Stack
+    Value: !Ref "AWS::StackName"
+    Condition: FirstWS
+
+
+
