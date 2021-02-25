@@ -76,7 +76,7 @@ Resources:
                   - ""
                   - - "arn:aws:s3:::"
                     - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
-                    - "/*"
+                    - "*"
   DomainControllerWaitCondition:
     Type: "AWS::CloudFormation::WaitCondition"
     DependsOn:
@@ -109,14 +109,14 @@ Resources:
               context:
                 Region: !Ref "AWS::Region"
                 StackId: !Ref "AWS::StackId"
-              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
             "C:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
               authentication: rolebased
               context:
                 Region: !Ref "AWS::Region"
                 ResourceName: DomainController
                 StackId: !Ref "AWS::StackId"
-              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
             "C:\\cfn\\install\\CleanupFiles.cmd":
               content: !Sub |
                 del /f /q c:\cfn\\install\local-admin-password.conf
@@ -126,52 +126,52 @@ Resources:
                 del /f /q c:\cfn\\install\arecord-info.conf
             "C:\\cfn\\install\\add-svcaccount.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/add-svcaccount.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/add-svcaccount.ps1"]]
             "C:\\cfn\\install\\change-administrator-password.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/change-administrator-password.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/change-administrator-password.ps1"]]
             "C:\\cfn\\install\\create-user.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/create-user.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/create-user.ps1"]]
             "C:\\cfn\\install\\configure-network.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/configure-dc-network.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/configure-dc-network.ps1"]]
             "C:\\cfn\\install\\dc-promo.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/dc-promo.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/dc-promo.ps1"]]
             "C:\\cfn\\install\\create-arecords.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/create-arecords.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/create-arecords.ps1"]]
             "C:\\cfn\\install\\local-admin-password.conf":
               authentication: rolebased
               context:
                 AdministratorPassword: !Ref dcAdminPassword
-              source: !Join ["/", [!Ref RootURL, "cfn-init/local-admin-password.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/local-admin-password.conf"]]
             "C:\\cfn\\install\\user.conf":
               authentication: rolebased
               context:
                 domainusername: !Ref testusername
                 domainpassword: !Ref testuserpassword
-              source: !Join ["/", [!Ref RootURL, "cfn-init/user.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/user.conf"]]
             "C:\\cfn\\install\\rename-computer.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/rename-computer.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/rename-computer.ps1"]]
             "C:\\cfn\\install\\svcaccount.conf":
               authentication: rolebased
               context:
                 SvcAccountPassword: !Ref adServiceAccountPassword
                 SvcAccountUserName: !Ref adServiceAccountUsername
-              source: !Join ["/", [!Ref RootURL, "cfn-init/svcaccount.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/svcaccount.conf"]]
             "C:\\cfn\\install\\wait-dc-services-ready.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/wait-dc-services-ready.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/wait-dc-services-ready.ps1"]]
             "c:\\cfn\\install\\domain-info.conf":
               authentication: rolebased
               context:
                 DomainDNSName: !Ref domainName
                 DomainNetBIOSName: !Ref DomainNetBIOSName
                 RestoreModePassword: !Ref safeModeAdminPassword
-              source: !Join ["/", [!Ref RootURL, "cfn-init/domain-info.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/domain-info.conf"]]
             "c:\\cfn\\install\\arecord-info.conf":
               authentication: rolebased
               context:
@@ -190,7 +190,7 @@ Resources:
                 IP9: !Select [9, !Split [", ", !Ref floatIPs]]
                 IP10: !Select [10, !Split [", ", !Ref floatIPs]]
                 IP11: !Select [11, !Split [", ", !Ref floatIPs]]
-              source: !Join ["/", [!Ref RootURL, "cfn-init/arecord-info.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/arecord-info.conf"]]
           services:
             windows:
               cfn-hup:

@@ -90,7 +90,7 @@ Resources:
                   - ""
                   - - "arn:aws:s3:::"
                     - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
-                    - "/*"
+                    - "*"
   WorkstationS3AccessProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -120,14 +120,14 @@ Resources:
               context:
                 Region: !Ref "AWS::Region"
                 StackId: !Ref "AWS::StackId"
-              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/cfn-hup.conf"]]
             "C:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
               authentication: rolebased
               context:
                 Region: !Ref "AWS::Region"
                 ResourceName: windowsGfxWorkstation
                 StackId: !Ref "AWS::StackId"
-              source: !Join ["/", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
             "C:\\cfn\\install\\CleanupFiles.cmd":
               content: !Sub |
                 del /f /q c:\cfn\\install\workstation.conf              
@@ -140,22 +140,22 @@ Resources:
                 adServiceAccountPassword: !Ref adServiceAccountPassword
                 domainName: !Ref domainName
                 adServiceAccountUsername: !Ref adServiceAccountUsername
-              source: !Join ["/", [!Ref RootURL, "cfn-init/workstation.conf"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/workstation.conf"]]
             "C:\\cfn\\install\\workstationsetup.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
             "C:\\mapdrive.ps1":
               content: !Sub |
                 New-PSDrive -Name Q -PSProvider FileSystem -Root "\\${FloatDNSName}\${SMBShareName}" -Scope Global -Persist
             "C:\\cfn\\install\\install-chrome.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/install-chrome.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/install-chrome.ps1"]]
             "C:\\cfn\\install\\launch-adobe.ps1":
               content: !Sub |
                 Start-Process -FilePath "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "https://creativecloud.adobe.com"
             "C:\\cfn\\install\\defender-exclude.ps1":
               authentication: rolebased
-              source: !Join ["/", [!Ref RootURL, "cfn-init/defender-exclude.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/defender-exclude.ps1"]]
           services:
             windows:
               cfn-hup:

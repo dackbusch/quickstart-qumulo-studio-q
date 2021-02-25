@@ -1,25 +1,38 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: This is the main template for the StudioQ AWS Quick Start.  It spins up Qumulo+Adobe+Teradici for a remote editorial environment.  It calls subordinate CloudFormation templates to instantiate the infrastructure.
+Description: This is the main template for the StudioQ AWS Quick Start.  It spins up Qumulo+Adobe+Teradici for a remote editorial environment.  It calls subordinate CloudFormation templates to instantiate the infrastructure. (qs-1rkounelh)
 
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
+    Order: "2"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
-          - S3BucketName
-          - S3KeyPrefix
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
           - KeyPair
           - SecretKeyName
 
       - Label: 
           default: AWS Network Configuration
         Parameters:
-          - AvailabilityZone
+          - VpcId
           - VpcCidr
+          - PublicSubnetId
           - PublicSubnetCidr
+          - PrivateSubnetId
           - PrivateSubnetCidr
+
+      - Label:
+          default: EC2 Security Group configuration
+        Parameters:
+          - allowInternalSGId
+          - allowqumuloSGId
+          - allowrdpSGId
 
       - Label:
           default: Qumulo File Data Platform Configuration
@@ -64,16 +77,30 @@ Metadata:
           - qumuloFloatRecordName
 
     ParameterLabels:
-      S3BucketName:
-        default: "MANDATORY: Quick Start S3 Bucket Name"
-      S3KeyPrefix:
-        default: "MANDATORY: Quick Start S3 Key Prefix Name"
+      QSS3BucketName:
+        default: Quick Start S3 bucket name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket Region
+      QSS3KeyPrefix:
+        default: Quick Start S3 key prefix
+      allowInternalSGId:
+        default: Internal security group ID
+      allowqumuloSGId:
+        default: Qumulo security group ID
+      allowrdpSGId:
+        default: RDP security group ID
       KeyPair:
         default: "MANDATORY: AWS Key-Pair Name"
       SecretKeyName:
         default: "MANDATORY: AWS Secret Key Name"
       AvailabilityZone:
         default: "MANDATORY: Specify an AZ"
+      VpcId:
+        default: "AWS VPC ID"
+      PublicSubnetId:
+        default: "Public subnet ID"
+      PrivateSubnetId:
+        default: "Private subnet ID"
       VpcCidr:
         default: "PREFER DEFAULT: AWS VPC Subnet"
       PublicSubnetCidr:
@@ -135,26 +162,56 @@ Metadata:
 
 Parameters:
 
-  S3BucketName: 
-    ConstraintDescription: >-
-      CloudFormation assets bucket name can include numbers, lowercase letters, uppercase
-      letters, and hyphens (-). It cannot start or end with a hyphen (-)
-    Description: >-
-      S3 bucket name for the CloudFormation assets. The bucket name
-      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
-      It cannot start or end with a hyphen (-).
+  QSS3BucketName:
+    AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
+    ConstraintDescription:
+      The Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a 
+      hyphen (-).
+    Default: aws-quickstart
+    Description:
+      Name of the S3 bucket for your copy of the Quick Start assets. 
+      Keep the default name unless you are customizing the template. 
+      Changing the name updates code references to point to a new Quick 
+      Start location. This name can include numbers, lowercase letters, 
+      uppercase letters, and hyphens, but do not start or end with a hyphen (-). 
+      See https://aws-quickstart.github.io/option1.html.
     Type: String
-    Default: qumuloadobe
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'AWS Region where the Quick Start S3 bucket (QSS3BucketName) is 
+    hosted. Keep the default Region unless you are customizing the template. 
+    Changing this Region updates code references to point to a new Quick Start location. 
+    When using your own bucket, specify the Region. 
+    See https://aws-quickstart.github.io/option1.html.'
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: '^[0-9a-zA-Z-/]*$'
+    ConstraintDescription:
+      The Quick Start S3 key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slashes (/).
+    Default: quickstart-qumulo-studio-q/
+    Description:
+      S3 key prefix that is used to simulate a directory for your copy of the 
+      Quick Start assets. Keep the default prefix unless you are customizing 
+      the template. Changing this prefix updates code references to point to 
+      a new Quick Start location. This prefix can include numbers, lowercase 
+      letters, uppercase letters, hyphens (-), and forward slashes (/). 
+      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html 
+      and https://aws-quickstart.github.io/option1.html.
+    Type: String
+  
+  allowInternalSGId:
+    Description: ID of the internal security group (e.g., sg-7f16e910).
+    Type: AWS::EC2::SecurityGroup::Id
 
-  S3KeyPrefix:
-    ConstraintDescription: >-
-      CloudFormation assets key prefix can include numbers, lowercase letters,
-      uppercase letters, and hyphens (-).
-    Description: >-
-      S3 key prefix for the CloudFormation assets. The key prefix can include numbers,
-      lowercase letters, uppercase letters, and hyphens (-).
-    Type: String
-    Default: quickstart-files
+  allowqumuloSGId:
+    Description: ID of the Qumulo security group (e.g., sg-7f16e910).
+    Type: AWS::EC2::SecurityGroup::Id
+
+  allowrdpSGId:
+    Description: ID of the RDP security group (e.g., sg-7f16e910).
+    Type: AWS::EC2::SecurityGroup::Id
 
   KeyPair:
     Description: Name of an existing EC2 Key Pair to enable authentication to instances
@@ -169,6 +226,18 @@ Parameters:
   AvailabilityZone:
     Description: All resources will be created in this AZ
     Type: AWS::EC2::AvailabilityZone::Name
+
+  VpcId:
+    Description: ID of the VPC (e.g., vpc-0343606e).
+    Type: AWS::EC2::VPC::Id
+
+  PublicSubnetId:
+    Description: ID of the private subnet.
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateSubnetId:
+    Description: ID of the private subnet.
+    Type: AWS::EC2::Subnet::Id
 
   VpcCidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$"
@@ -390,6 +459,9 @@ Parameters:
     Default: qumulo
 
 Conditions:
+
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+
   4x5TBHybrid: !Equals
     - !Ref QCapacityType
     - "12TB Hybrid"
@@ -414,16 +486,16 @@ Conditions:
   Provision9: !Or [Condition: Nine, Condition: Ten]
 
 Resources:
-  AWSVPCSTACK:
-    Type: "AWS::CloudFormation::Stack"
-    Properties:
-      Parameters:
-        PrivateSubnetCidr: !Ref PrivateSubnetCidr
-        PublicSubnetCidr: !Ref PublicSubnetCidr
-        VpcCidr: !Ref VpcCidr
-        AvailabilityZone: !Ref AvailabilityZone
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/aws-vpc.cft.yaml"
-      TimeoutInMinutes: 150
+#  AWSVPCSTACK:
+#    Type: "AWS::CloudFormation::Stack"
+#    Properties:
+#      Parameters:
+#        PrivateSubnetCidr: !Ref PrivateSubnetCidr
+#        PublicSubnetCidr: !Ref PublicSubnetCidr
+#        VpcCidr: !Ref VpcCidr
+#        AvailabilityZone: !Ref AvailabilityZone
+#      TemplateURL: !Sub "https://${QSS3BucketName}.s3.${AWS::URLSuffix}/${QSS3KeyPrefix}/cfn/aws-vpc.cft.yaml"
+#      TimeoutInMinutes: 150
 
   SECRETSSTACK:
     Type: "AWS::CloudFormation::Stack"
@@ -439,14 +511,22 @@ Resources:
         safeModeAdminPassword: !Ref safeModeAdminPassword
         testusername: !Ref testusername
         testuserpassword: !Ref testuserpassword
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/store-secrets.cft.yaml"
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/store-secrets.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150      
 
   QIAMSTACK:
     Type: "AWS::CloudFormation::Stack"
     DependsOn: AWSVPCSTACK
     Properties:
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/qiam.cft.yaml"
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qiam.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   QSTACK:
@@ -460,13 +540,15 @@ Resources:
         InstanceType: !Ref QInstanceType
         KeyName: !Ref KeyPair
         SgCidr: !Ref QSgCidr
-        SubnetId: !GetAtt AWSVPCSTACK.Outputs.PrivateSubnetId
+        SubnetId: !Ref PrivateSubnetId
         VolumesEncryptionKey: !Ref VolumesEncryptionKey
-        VpcId: !GetAtt AWSVPCSTACK.Outputs.VPCID
-      TemplateURL: !If
-        - 4x5TBHybrid
-        - !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/4x5TiB-Hybrid-st1-SA.template.json"
-        - !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/4x600GiB-AF-SA.template.json"
+        VpcId: !Ref VpcId
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/${QTemplate}
+          - QSTemplate: !If [4x5TBHybrid, '4x5TiB-Hybrid-st1-SA.template.json', '4x600GiB-AF-SA.template.json']
+            S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   MGMTNLBSTACK:
@@ -474,10 +556,14 @@ Resources:
     DependsOn: QSTACK
     Properties:
       Parameters:
-        VPCID: !GetAtt AWSVPCSTACK.Outputs.VPCID
-        PublicSubnetID: !GetAtt AWSVPCSTACK.Outputs.PublicSubnetId
+        VPCID: !Ref VpcId
+        PublicSubnetID: !Ref PublicSubnetId
         NodeIPs: !GetAtt QSTACK.Outputs.ClusterPrivateIPs
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/mgmt-nlb.cft.yaml"
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/mgmt-nlb.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   DCSTACK:
@@ -487,9 +573,9 @@ Resources:
       Parameters:
         DirectoryServerAmi: !Ref DirectoryServerAmi
         DirectoryServerKeyName: !Ref KeyPair
-        DirectoryServerSG: !GetAtt AWSVPCSTACK.Outputs.allowInternalSGId
-        DirectoryServerSubnet: !GetAtt AWSVPCSTACK.Outputs.PrivateSubnetId
-        DirectoryServerVPC: !GetAtt AWSVPCSTACK.Outputs.VPCID
+        DirectoryServerSG: !Ref allowInternalSGId
+        DirectoryServerSubnet: !Ref PrivateSubnetId
+        DirectoryServerVPC: !Ref VpcId
         DomainNetBIOSName: !Select [0, !Split [".", !Ref domainName]]
         adServiceAccountPassword: !Ref adServiceAccountPassword
         adServiceAccountUsername: !Ref adServiceAccountUsername
@@ -501,8 +587,16 @@ Resources:
         safeModeAdminPassword: !Ref safeModeAdminPassword
         floatIPs: !GetAtt QSTACK.Outputs.ClusterSecondaryPrivateIPs
         recordName: !Ref qumuloFloatRecordName
-        RootURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/dc.cft.yaml"
+        RootURL:
+          !Sub
+            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}"
+            - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+              S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/dc.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   PROVISIONINGSTACK:
@@ -515,18 +609,22 @@ Resources:
         SecretsManagedPolicy: "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
         KeyName: !Ref KeyPair
         Region: !Ref AWS::Region
-        PrivateSubnetId: !GetAtt AWSVPCSTACK.Outputs.PrivateSubnetId
+        PrivateSubnetId: !Ref PrivateSubnetId
         PrivateSubnetCidr: !Ref PrivateSubnetCidr
         Node1IP: !Select [0, !Split [", ", !GetAtt QSTACK.Outputs.ClusterPrivateIPs]]
         FloatIPs: !GetAtt QSTACK.Outputs.ClusterSecondaryPrivateIPs
         SMBShareName: !Ref SMBShareName
         ClusterPwd: !GetAtt QSTACK.Outputs.TemporaryPassword
-        VPCID: !GetAtt AWSVPCSTACK.Outputs.VPCID
+        VPCID: !Ref VpcId
         domainName: !Ref domainName
         dcServerIp: !GetAtt DCSTACK.Outputs.DirectoryserverPrivateIP
         DomainControllerSecretsArn: !GetAtt SECRETSSTACK.Outputs.DomainControllerSecretsArn
         SideCarSecretsArn: !GetAtt SECRETSSTACK.Outputs.SideCarSecretsArn
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/provisioning-node.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/provisioning-node.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   QSIDECARSTACK:
@@ -534,9 +632,9 @@ Resources:
     DependsOn: PROVISIONINGSTACK
     Properties:
       Parameters:
-        SecurityGroup: !GetAtt AWSVPCSTACK.Outputs.allowqumuloSGId
+        SecurityGroup: !Ref allowqumuloSGId
         SNSTopic: !Ref SideCarSNSTopic
-        Subnet: !GetAtt AWSVPCSTACK.Outputs.PrivateSubnetId
+        Subnet: !Ref PrivateSubnetId
         Username: !Ref SideCarUsername
         Password: !Ref SideCarPassword
         Hosts: !GetAtt QSTACK.Outputs.ClusterPrivateIPs
@@ -554,8 +652,8 @@ Resources:
         adServiceAccountUsername: !Ref adServiceAccountUsername
         domainName: !Ref domainName
         gfxworkstationKeyName: !Ref KeyPair
-        gfxworkstationSG: !GetAtt AWSVPCSTACK.Outputs.allowrdpSGId
-        gfxworkstationSubnet: !GetAtt AWSVPCSTACK.Outputs.PublicSubnetId
+        gfxworkstationSG: !Ref allowrdpSGId
+        gfxworkstationSubnet: !Ref PublicSubnetId
         pcoipAgentFilename: "null"
         pcoipAgentLocationUrl: "https://downloads.teradici.com/win/stable/"
         pcoipRegistrationCode: "X60YKMSS4VEE@0633-9958-E79C-F865"
@@ -565,8 +663,16 @@ Resources:
         SMBShareName: !Ref SMBShareName
         FloatDNSName: !Ref qumuloFloatRecordName
         DomainControllerSecretsName: !GetAtt SECRETSSTACK.Outputs.DomainControllerSecretsName 
-        RootURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/cfn/gfx-workstation.cft.yaml" 
+        RootURL:
+          !Sub
+            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}"
+            - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+              S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/gfx-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK2:
@@ -578,7 +684,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "2"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK3:
@@ -590,7 +700,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "3"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK4:
@@ -602,7 +716,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "4"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK5:
@@ -614,7 +732,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "5"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK6:
@@ -626,7 +748,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "6"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK7:
@@ -638,7 +764,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "7"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK8:
@@ -650,7 +780,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "8"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK9:
@@ -662,7 +796,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "9"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
   WORKSTATIONSTACK10:
@@ -674,7 +812,11 @@ Resources:
         WorkstationStackName: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         WorkstationNumber: "10"
-      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::URLSuffix}/${S3KeyPrefix}/qs-studioq-add-workstation.cft.yaml" 
+      TemplateURL:
+        !Sub
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/qs-studioq-add-workstation.cft.yaml
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
 
 Outputs:
