@@ -1,0 +1,37 @@
+project:
+  name: quickstart-qumulo-studio-q
+  owner: quickstart-eng@amazon.com
+  package_lambda: false
+  regions:
+  - ap-northeast-1
+  - ap-northeast-2
+  - ap-south-1
+  - ap-southeast-1
+  - ap-southeast-2
+  - ca-central-1
+  - eu-central-1
+  - eu-west-1
+  - eu-west-2
+  - eu-west-3
+  - sa-east-1
+  - us-east-1
+  - us-east-2
+  - us-west-1
+  - us-west-2
+  s3_bucket: ''
+tests:
+  qumulo:
+    parameters:
+      AvailabilityZone: $[taskcat_getaz_1]
+      adServiceAccountPassword: $[taskcat_genpass_16]
+      dcAdminPassword: $[taskcat_genpass_16]
+      safeModeAdminPassword: $[taskcat_genpass_16]
+      testuserpassword: $[taskcat_genpass_16]
+      SideCarPassword: $[taskcat_genpass_16]
+      KeyPair: $[taskcat_getkeypair]
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+    regions:
+    - eu-west-1
+    s3_bucket: ''
+    template: template/qs-studioq-main-new-vpc.template.yaml
