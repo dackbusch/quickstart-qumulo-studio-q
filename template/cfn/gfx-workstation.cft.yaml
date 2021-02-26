@@ -1,5 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: This template instantiates an EC2 instance with Teradici installed and a prompt to install Adobe Premier Pro via Adobe Creative Cloud
+Metadata:
+  AWSAMIRegionMap:
+    Filters:
+      TERADICIWIN:
+        name: graphics-agent-windows-2019-aws-market*
+        owner-alias: aws-marketplace
+        product-code.type: marketplace
+        product-code: 4af6zv023dsu3c28day09b2a9
 Parameters:
   FirstStation:
     Type: String
@@ -22,8 +30,6 @@ Parameters:
     Type: String
   gfxworkstationKeyName:
     Type: String
-  windowsGfxInstanceAMI:
-    Type: String
   windowsGrxInstanceType:
     Type: String
   workstationAdminPassword:
@@ -44,6 +50,39 @@ Conditions:
   FirstWS: !Equals
     - !Ref FirstStation
     - "TRUE"
+
+Mappings:
+  AWSAMIRegionMap:
+    us-east-1:
+      TERADICIWIN: ami-0299806a7a0db74d5
+    us-east-2:
+      TERADICIWIN: ami-0f095edee697b1ef3
+    us-west-1:
+      TERADICIWIN: ami-08281d8103b7f233f
+    us-west-2:
+      TERADICIWIN: ami-0f7adbd07e91f6e83 
+    ap-south-1:
+      TERADICIWIN: ami-0702d91f70d599eed
+    ap-northeast-1:
+      TERADICIWIN: ami-03ecf29831389b4b9
+    ap-northeast-2:
+      TERADICIWIN: ami-07b7cbeb34f3aec62
+    ap-southeast-1:
+      TERADICIWIN: ami-0c31c675576e68ef7
+    ap-southeast-2:
+      TERADICIWIN: ami-0d08f56894d871c29
+    ca-central-1:
+      TERADICIWIN: ami-0904994a77fe6564f
+    eu-central-1:
+      TERADICIWIN: ami-04ebd347ba3b42e14
+    eu-west-1:
+      TERADICIWIN: ami-06f1c5023ce0f9d81
+    eu-west-2:
+      TERADICIWIN: ami-08f26e8c09e56cd6e
+    eu-west-3:
+      TERADICIWIN: ami-0cca22c15cd254f37
+    sa-east-1:
+      TERADICIWIN: ami-07819057af66de0b6
 
 Resources:
 
@@ -196,7 +235,7 @@ Resources:
               waitAfterCompletion: 0
 
     Properties:
-      ImageId: !Ref windowsGfxInstanceAMI
+      ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", TERADICIWIN]
       InstanceType: !Ref windowsGrxInstanceType
       Monitoring: false
       IamInstanceProfile: !Ref WorkstationS3AccessProfile
@@ -284,7 +323,7 @@ Resources:
     Condition: FirstWS
     Properties:
       Name: !Sub "${AWS::StackName}-windowsGfxInstanceAMI"       
-      Value: !Ref windowsGfxInstanceAMI
+      Value: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", TERADICIWIN]
       Type: String
 
   windowsGrxInstanceTypeSSM: 

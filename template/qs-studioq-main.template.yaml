@@ -57,7 +57,6 @@ Metadata:
       - Label:
           default: Adobe Workstation Configuration
         Parameters:
-          - windowsGfxInstanceAMI
           - windowsGrxInstanceType
           - numberOfWorkstations
 
@@ -90,11 +89,11 @@ Metadata:
       allowrdpSGId:
         default: RDP security group ID
       KeyPair:
-        default: "MANDATORY: AWS Key-Pair Name"
+        default: "AWS Key-Pair Name"
       SecretKeyName:
-        default: "MANDATORY: AWS Secret Key Name"
-      AvailabilityZone:
-        default: "MANDATORY: Specify an AZ"
+        default: "AWS Secret Key Name"
+#      AvailabilityZone:
+#        default: "Specify an AZ"
       VpcId:
         default: "AWS VPC ID"
       PublicSubnetId:
@@ -102,63 +101,61 @@ Metadata:
       PrivateSubnetId:
         default: "Private subnet ID"
       VpcCidr:
-        default: "PREFER DEFAULT: AWS VPC Subnet"
+        default: "AWS VPC Subnet"
       PublicSubnetCidr:
-        default: "PREFER DEFAULT: AWS VPC Public Subnet"
+        default: "AWS VPC Public Subnet"
       PrivateSubnetCidr:
-        default: "PREFER DEFAULT: AWS VPC Private Subnet"
+        default: "AWS VPC Private Subnet"
       QClusterName:
-        default: "PREFER DEFAULT: Qumulo Cluster Name"
+        default: "Qumulo Cluster Name"
       QInstanceType:
-        default: "MANDATORY: Qumulo EC2 Instance Type"
+        default: "Qumulo EC2 Instance Type"
       QCapacityType:
-        default: "MANDATORY: Qumulo Usable Capacity and Media Type"
+        default: "Qumulo Usable Capacity and Media Type"
       VolumesEncryptionKey:
         default: "OPTIONAL: AWS EBS Volumes Encryption Key "
       QInstanceRecoveryTopic:
         default: "OPTIONAL: Qumulo Instance Recovery Topic"
       QSgCidr:
-        default: "PREFER DEFAULT: Qumulo Security Group "
+        default: "Qumulo Security Group "
       ProvisioningServerAMI:
-        default: "PREFER DEFAULT: Linux Server for Secondary Configuration of Qumulo "
+        default: "Linux Server for Secondary Configuration of Qumulo "
       SMBShareName:
-        default: "PREFER DEFAULT: SMB Share Name "
+        default: "SMB Share Name "
       SideCarTemplate:
-        default: "PREFER DEFAULT: Qumulo Sidecar Template URL "
+        default: "Qumulo Sidecar Template URL "
       SideCarUsername:
-        default: "PREFER DEFAULT: Qumulo Sidecar Username "
+        default: "Qumulo Sidecar Username "
       SideCarPassword:
-        default: "MANDATORY: Qumulo Sidecar Password "
+        default: "Qumulo Sidecar Password "
       SideCarSNSTopic:
         default: "OPTIONAL: Qumulo Sidecar SNS Topic "
-      windowsGfxInstanceAMI:
-        default: "MANDATORY: AWS Teradici AMI "
       windowsGrxInstanceType:
-        default: "MANDATORY: AWS Teradici Instance Type "
+        default: "AWS Teradici Instance Type "
       numberOfWorkstations:
         default: "OPTIONAL: Total Number of Adobe Workstations"
       DirectoryServerAmi:
-        default: "PREFER DEFAULT: AWS Directory Server AMI "
+        default: "AWS Directory Server AMI "
       dcInstanceType: 
-        default: "PREFER DEFAULT: AWS Directory Server Instance Type "
+        default: "AWS Directory Server Instance Type "
       domainName: 
-        default: "PREFER DEFAULT: Domain Name "
+        default: "Domain Name "
       adServiceAccountUsername:
-        default: "PREFER DEFAULT: Active Directory Service Admin Username "
+        default: "Active Directory Service Admin Username "
       adServiceAccountPassword:
-        default: "MANDATORY: Active Directory Service Admin Password "
+        default: "Active Directory Service Admin Password "
       dcAdminUsername:
-        default: "PREFER DEFAULT: Domain Controller Admin Username "
+        default: "Domain Controller Admin Username "
       dcAdminPassword:
-        default: "MANDATORY: Domain Controller Admin Password "
+        default: "Domain Controller Admin Password "
       safeModeAdminPassword:
-        default: "MANDATORY: Domain Controller Safe-Mode Admin Password "
+        default: "Domain Controller Safe-Mode Admin Password "
       testusername:
-        default: "PREFER DEFAULT: Active Directory Account Username "
+        default: "Active Directory Account Username "
       testuserpassword: 
-        default: "MANDATORY: Active Directory Account User Password "
+        default: "Active Directory Account User Password "
       qumuloFloatRecordName:
-        default: "PREFER DEFAULT: DNS Record Name for Qumulo RR DNS "
+        default: "DNS Record Name for Qumulo RR DNS "
 
 Parameters:
 
@@ -221,11 +218,10 @@ Parameters:
   SecretKeyName:
     Description: Name of an existing Secret in Secrets Manager that stores the Key Pair PEM file as plaintext
     Type: String
-    Default: pemsecret
 
-  AvailabilityZone:
-    Description: All resources will be created in this AZ
-    Type: AWS::EC2::AvailabilityZone::Name
+#  AvailabilityZone:
+#    Description: All resources will be created in this AZ
+#    Type: AWS::EC2::AvailabilityZone::Name
 
   VpcId:
     Description: ID of the VPC (e.g., vpc-0343606e).
@@ -297,7 +293,6 @@ Parameters:
       If empty, the default KMS EBS key will be used. Choosing an invalid key name
       will cause the instance to fail to launch.
     Type: String
-    Default: 3d26f779-69a4-4de1-b16f-3a69152ce1ee
 
   QInstanceRecoveryTopic:
     Description: Optionally enter the ARN of an SNS topic that receives messages when an instance alarm is triggered.
@@ -312,8 +307,8 @@ Parameters:
 
   ProvisioningServerAMI: 
     Description: AWS Linux Server AMI
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
   SMBShareName:
     Description: SMB Share Name
@@ -321,7 +316,7 @@ Parameters:
     Default: adobe-projects
 
   SideCarTemplate:
-    Description: Do not change this unless  newer version of Qumulo is being used.
+    Description: Do not change this unless newer version of Qumulo is being used.
     Type: String
     Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/3.3.0/sidecar_cft.json"
 
@@ -335,18 +330,12 @@ Parameters:
     MaxLength: 128
     MinLength: 8
     Type: String
-    Default: secuRe_pwd4
     NoEcho: "true"
 
   SideCarSNSTopic:
     Description: Optionally enter an SNS topic ARN that lambda errors and successful disk replacements will be published to
     Type: String
     Default: ""
-
-  windowsGfxInstanceAMI: 
-    Description: Enter the Teradici image ID from marketplace
-    Type: AWS::EC2::Image::Id
-    Default: ami-0ccbb970e1176a12c
 
   windowsGrxInstanceType:
     AllowedValues:
@@ -378,7 +367,7 @@ Parameters:
   DirectoryServerAmi:
     Description: AWS Windows Server AMI for Domain Controller and Active Directory
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 
   dcInstanceType:
     Description: Domain Controller Instance Type
@@ -407,7 +396,6 @@ Parameters:
     MinLength: 8
     MaxLength: 32
     Type: String
-    Default: secuRe_pwd3
     NoEcho: "true"
 
   dcAdminUsername:
@@ -424,7 +412,6 @@ Parameters:
     MinLength: 8
     MaxLength: 32
     Type: String
-    Default: secuRe_pwd1
     NoEcho: "true"
 
   safeModeAdminPassword:
@@ -433,7 +420,6 @@ Parameters:
     MinLength: 8
     MaxLength: 32
     Type: String
-    Default: secuRe_pwd2
     NoEcho: "true"
 
   testusername:
@@ -450,7 +436,6 @@ Parameters:
     MinLength: 8
     MaxLength: 32
     Type: String
-    Default: CloudIsCool202!
     NoEcho: "true"
 
   qumuloFloatRecordName:
@@ -499,7 +484,6 @@ Resources:
 
   SECRETSSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: AWSVPCSTACK
     Properties:
       Parameters:
         SideCarUsername: !Ref SideCarUsername
@@ -520,7 +504,6 @@ Resources:
 
   QIAMSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: AWSVPCSTACK
     Properties:
       TemplateURL:
         !Sub
@@ -546,7 +529,7 @@ Resources:
       TemplateURL:
         !Sub
           - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/${QTemplate}
-          - QSTemplate: !If [4x5TBHybrid, '4x5TiB-Hybrid-st1-SA.template.json', '4x600GiB-AF-SA.template.json']
+          - QTemplate: !If [4x5TBHybrid, '4x5TiB-Hybrid-st1-SA.template.json', '4x600GiB-AF-SA.template.json']
             S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
@@ -589,7 +572,7 @@ Resources:
         recordName: !Ref qumuloFloatRecordName
         RootURL:
           !Sub
-            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}"
+            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/"
             - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
               S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TemplateURL:
@@ -657,7 +640,6 @@ Resources:
         pcoipAgentFilename: "null"
         pcoipAgentLocationUrl: "https://downloads.teradici.com/win/stable/"
         pcoipRegistrationCode: "X60YKMSS4VEE@0633-9958-E79C-F865"
-        windowsGfxInstanceAMI: !Ref windowsGfxInstanceAMI
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
         workstationAdminPassword: !Ref adServiceAccountPassword
         SMBShareName: !Ref SMBShareName
@@ -665,7 +647,7 @@ Resources:
         DomainControllerSecretsName: !GetAtt SECRETSSTACK.Outputs.DomainControllerSecretsName 
         RootURL:
           !Sub
-            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}"
+            - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/"
             - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
               S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TemplateURL:
