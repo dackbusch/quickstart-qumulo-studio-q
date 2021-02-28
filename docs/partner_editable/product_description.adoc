@@ -2,4 +2,4 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-<Describe how the software works on AWS.>
+Studio Q’s powerful remote desktop is ideal for global creative teams and enterprise companies searching for a simple solution to share substantial data and collaborate from anywhere in the world. Qumulo’s multiprotocol capabilities support the program’s ability to sustain petabyte levels of growing video and editorial content as well as new projects, with built-in security and data protection. 

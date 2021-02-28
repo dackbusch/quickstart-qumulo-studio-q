@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template instantiates an AWS Network Load Balancer connected to the Qumulo Cluster Static IP addresses, insuring reachability
+Description: This template instantiates an AWS Network Load Balancer connected to the Qumulo Cluster Static IP addresses, ensuring reachability
 
 Parameters:
   VPCID:
@@ -30,12 +30,12 @@ Resources:
           - NLBEIP
           - AllocationId
           SubnetId: !Ref PublicSubnetID
-      Tags:
-        - Key: Name
-          Value: !Join
-            - ""
-            - - Ref: "AWS::StackName"
-              - " - Qumulo Management NLB"
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - ""
+#            - - Ref: "AWS::StackName"
+#              - " - Qumulo Management NLB"
 
   NLBTargetGroupMgmt:
     Type: "AWS::ElasticLoadBalancingV2::TargetGroup"

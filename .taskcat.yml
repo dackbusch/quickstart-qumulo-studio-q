@@ -29,6 +29,7 @@ tests:
       testuserpassword: $[taskcat_genpass_16]
       SideCarPassword: $[taskcat_genpass_16]
       KeyPair: $[taskcat_getkeypair]
+      SecretKeyName: override
       QSS3BucketName: $[taskcat_autobucket]
       QSS3BucketRegion: $[taskcat_current_region]
     regions:
