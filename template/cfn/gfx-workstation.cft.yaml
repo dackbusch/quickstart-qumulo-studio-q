@@ -104,7 +104,7 @@ Resources:
       GroupSet:
         -  !Ref gfxworkstationSG
 
-  WorkstationS3AccessRole:
+  WorkstationAccessRole:
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
@@ -130,12 +130,21 @@ Resources:
                   - - "arn:aws:s3:::"
                     - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
                     - "*"
-  WorkstationS3AccessProfile:
+        - PolicyName: WorkstationSecretsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:DescribeSecret
+                Resource: "*"
+  WorkstationAccessProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       Path: /
       Roles:
-        - !Ref WorkstationS3AccessRole
+        - !Ref WorkstationAccessRole
 
   windowsGfxWorkstation:
     Type: 'AWS::EC2::Instance'
@@ -144,7 +153,7 @@ Resources:
         rolebased:
           buckets:
             - qumuloadobe
-          roleName: !Ref WorkstationS3AccessRole
+          roleName: !Ref WorkstationAccessRole
           type: S3
 
       "AWS::CloudFormation::Init":
@@ -225,11 +234,16 @@ Resources:
                   - !Ref domainName
                   - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File c:\\cfn\\install\\launch-adobe.ps1\""
               waitAfterCompletion: 0
-            "05-configure-task-map-drive":
+            "05-configure-task-defender-exclude":
               command: !Join 
                 - ""
-                - - "schtasks /create /tn \"Exclude Defender Q:\\ Drive\" /ru \""
-                  - "System\" /sc ONLOGON /tr \"powershell.exe -Command Start-Process PowerShell -ArgumentList \"-File c:\\cfn\\install\\defender-exclude.ps1\""
+                - - "schtasks /create /tn \"Exclude Defender Q Drive\" /ru \""
+                  - !Ref domainName
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File C:\\cfn\\install\\defender-exclude.ps1 -DomainControllerSecrets "
+                  - !Ref DomainControllerSecretsName
+                  - " -DomainName "
+                  - !Ref domainName
+                  - "\" /rl HIGHEST"
             "06-cleanup-files":
               command: "C:\\cfn\\install\\CleanupFiles.cmd"
               waitAfterCompletion: 0
@@ -238,7 +252,7 @@ Resources:
       ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", TERADICIWIN]
       InstanceType: !Ref windowsGrxInstanceType
       Monitoring: false
-      IamInstanceProfile: !Ref WorkstationS3AccessProfile
+      IamInstanceProfile: !Ref WorkstationAccessProfile
       NetworkInterfaces:
         - NetworkInterfaceId: !Ref WorkstationNI
           DeviceIndex: 0

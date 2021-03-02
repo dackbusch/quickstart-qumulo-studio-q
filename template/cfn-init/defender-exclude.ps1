@@ -20,11 +20,34 @@
 # adds and exclusion to Defender for the Q: drive
 # and finally it enables UAC
 #
-# Disable UAC
-Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
 
-# Disable Defender Realtime Scanning on Q: drive SMB mount for Qumulo
-Add-MpPreference -ExclusionPath "Q:\"
+param(
+    [Parameter(Mandatory = $true)][string]$DomainControllerSecrets,
+    [Parameter(Mandatory=$true)][string] $DomainName
+)
 
-# Enable UAC
-Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000005
+$AdminSecret = Get-SECSecretValue -SecretId $DomainControllerSecrets -ErrorAction Stop | Select-Object -ExpandProperty 'SecretString'
+$ADAdminPassword = ConvertFrom-Json -InputObject $AdminSecret -ErrorAction Stop
+$AdminUserName = $ADAdminPassword.dcAdminUsername
+$AdminUserPW = ConvertTo-SecureString ($ADAdminPassword.dcAdminPassword) -AsPlainText -Force
+$Credentials = New-Object -TypeName 'System.Management.Automation.PSCredential' ("$DomainName\$AdminUserName", $AdminUserPW)
+
+$ScriptBlock={
+
+    # Disable UAC
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
+
+    # Disable Defender Realtime Scanning on Q: drive SMB mount for Qumulo
+    Add-MpPreference -ExclusionPath "Q:\"
+
+    # Enable UAC
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000005
+
+}
+
+WinRM quickconfig -force
+net start WinRM
+
+Invoke-Command -ScriptBlock $ScriptBlock -Computername localhost -Credential $Credentials
+
+net stop WinRM
