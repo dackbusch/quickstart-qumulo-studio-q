@@ -232,6 +232,7 @@ Parameters:
       If empty, the default KMS EBS key will be used. Choosing an invalid key name
       will cause the instance to fail to launch.
     Type: String
+    Default: ''
  
   QInstanceRecoveryTopic:
     Description: Optionally enter the ARN of an SNS topic that receives messages when an instance alarm is triggered.

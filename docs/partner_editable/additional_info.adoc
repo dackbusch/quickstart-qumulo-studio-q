@@ -4,20 +4,29 @@
 == Test the deployment
 // If steps are required to test the deployment, add them here. If not, remove the heading
 
-== Post-deployment steps
-// If post-deployment steps are required, add them here. If not, remove the heading
+. Check the *Outputs* section of the workstation stack and copy the GFXWorkstationHostname value.
 
-== Best practices for using {partner-product-short-name} on AWS
-// Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
+[#test1]
+.Workstation stack outputs
+image::../images/image1.png[Architecture,width=100%,height=100%]
 
-_Add any best practices for using the software._
+[start=2]
+. Open an RDP client and paste the GFXWorkstationHostname value.
 
-== Security
-// Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
+[#test2]
+.RDP session
+image::../images/image2.png[Architecture,width=50%,height=50%]
 
-_Add any security-related information._
+[start=3]
+. Enter one of the test users' usernames and the password you entered when deploying the Quick Start.
 
-== Other useful information
-//Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
+[#test3]
+.StudioQ username and password
+image::../images/image3.png[Architecture,width=50%,height=50%]
 
-_Add any other details that will help the customer use the software on AWS._
+[start=4]
+. After logging into the workstation, open File Explorer and verify that the Q: drive is present.
+
+[#test4]
+.Q drive
+image::../images/image4.png[Architecture,width=100%,height=100%]
