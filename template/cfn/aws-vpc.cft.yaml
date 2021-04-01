@@ -20,10 +20,7 @@ Resources:
       CidrBlock: !Ref VpcCidr
       Tags:
         - Key: Name
-          Value: !Join
-            - ""
-            - - !Ref "AWS::StackName"
-              - " - Qumulo Adobe Quickstart"
+          Value: !Sub "${AWS::StackName} - Studio-Q Quickstart"
 
   PublicSubnet:
     Type: "AWS::EC2::Subnet"
@@ -33,10 +30,7 @@ Resources:
       AvailabilityZone: !Ref AvailabilityZone
       Tags:
         - Key: Name
-          Value: !Join
-            - ""
-            - - !Ref "AWS::StackName"
-              - " - Public"
+          Value: !Sub "${AWS::StackName} - Public"
 
   PrivateSubnet:
     Type: "AWS::EC2::Subnet"
@@ -46,13 +40,14 @@ Resources:
       AvailabilityZone: !Ref AvailabilityZone
       Tags:
         - Key: Name
-          Value: !Join
-            - ""
-            - - !Ref "AWS::StackName"
-              - " - Private"
+          Value: !Sub "${AWS::StackName} - Private"
 
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} - Studio-Q Quickstart"
 
   VPCGatewayAttachment:
     Type: "AWS::EC2::VPCGatewayAttachment"
@@ -64,11 +59,17 @@ Resources:
     Type: "AWS::EC2::RouteTable"
     Properties:
       VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} - Public"
 
   PrivateRouteTable:
     Type: "AWS::EC2::RouteTable"
     Properties:
       VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} - Private"
 
   PublicRoute:
     Type: "AWS::EC2::Route"
@@ -97,12 +98,18 @@ Resources:
         - NatEIP
         - AllocationId
       SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} - Studio-Q Quickstart"
 
   NatEIP:
     DependsOn: VPCGatewayAttachment
     Type: "AWS::EC2::EIP"
     Properties:
       Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} - Studio-Q Quickstart"
 
   NatRoute:
     Type: "AWS::EC2::Route"
@@ -117,139 +124,6 @@ Resources:
       GroupDescription: default
       VpcId: !Ref VPC
 
-  allowInternalSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: "allow internal"
-      SecurityGroupIngress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: !Ref VpcCidr
-      VpcId: !Ref VPC
-
-  allowsshSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow ssh
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref VpcCidr
-      VpcId: !Ref VPC
-
-  allowrdpSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow rdp
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: udp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 5986
-          ToPort: 5986
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 4172
-          ToPort: 4172
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: udp
-          FromPort: 4172
-          ToPort: 4172
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPC
-
-  allowicmpSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow icmp
-      SecurityGroupIngress:
-        - IpProtocol: icmp
-          FromPort: 8
-          ToPort: 0
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPC
-
-  allowpcoipSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow pcoip
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 4172
-          ToPort: 4172
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: udp
-          FromPort: 4172
-          ToPort: 4172
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPC
-
-  allowqumuloSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow qumulo
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: tcp
-          FromPort: 8000
-          ToPort: 8000
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: tcp
-          FromPort: 3712
-          ToPort: 3712
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: tcp
-          FromPort: 21
-          ToPort: 21
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: udp
-          FromPort: 2049
-          ToPort: 2049
-          CidrIp: !Ref VpcCidr
-        - IpProtocol: tcp
-          FromPort: 111
-          ToPort: 111
-          CidrIp: !Ref VpcCidr
-      VpcId: !Ref VPC
-
-  allowleaderqumuloSG:
-    Type: "AWS::EC2::SecurityGroup"
-    Properties:
-      GroupDescription: allow leader qumulo
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: !Ref PrivateSubnetCidr
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref PrivateSubnetCidr
-      VpcId: !Ref VPC
-
 Outputs:
   VPCID:
     Value: !Ref VPC
@@ -257,12 +131,5 @@ Outputs:
     Value: !Ref PrivateSubnet
   PublicSubnetId:
     Value: !Ref PublicSubnet
-  allowleaderqumuloSGId:
-    Value: !Ref allowleaderqumuloSG
-  allowqumuloSGId:
-    Value: !Ref allowqumuloSG
-  allowrdpSGId:
-    Value: !Ref allowrdpSG
-  allowInternalSGId:
-    Value: !Ref allowInternalSG
+
 

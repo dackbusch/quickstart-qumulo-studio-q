@@ -45,11 +45,17 @@ Parameters:
     Type: String
   DomainControllerSecretsName:
     Type: String
+  BucketName:
+    Type: String
 
 Conditions:
   FirstWS: !Equals
     - !Ref FirstStation
     - "TRUE"
+
+  ProvVPC: !Equals
+    - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
+    - "StudioQStack"
 
 Mappings:
   AWSAMIRegionMap:
@@ -90,6 +96,24 @@ Resources:
     Type: "AWS::EC2::EIP"
     Properties:
       Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !If
+            - ProvVPC
+            - !Join
+              - "-"
+              - - !Select [0, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [2, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [3, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [4, !Split ["-", !Ref "AWS::StackName"]]                                    
+                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"  
+            - !Join
+              - "-"
+              - - !Select [0, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [2, !Split ["-", !Ref "AWS::StackName"]]
+                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"     
 
   AssociateEIP:
     Type: "AWS::EC2::EIPAssociation"
@@ -128,7 +152,7 @@ Resources:
                 Resource: !Join
                   - ""
                   - - "arn:aws:s3:::"
-                    - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
+                    - !Ref BucketName
                     - "*"
         - PolicyName: WorkstationSecretsAccess
           PolicyDocument:
@@ -139,6 +163,7 @@ Resources:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:DescribeSecret
                 Resource: "*"
+                
   WorkstationAccessProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -176,6 +201,15 @@ Resources:
                 ResourceName: windowsGfxWorkstation
                 StackId: !Ref "AWS::StackId"
               source: !Join ["", [!Ref RootURL, "cfn-init/cfn-auto-reloader.conf"]]
+            "C:\\cfn\\install\\studioq-desktop.jpg":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/studioq-desktop.jpg"]]
+            "C:\\cfn\\install\\qumulo.ico":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/qumulo.ico"]]    
+            "C:\\cfn\\install\\disk.ico":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/disk.ico"]]  
             "C:\\cfn\\install\\CleanupFiles.cmd":
               content: !Sub |
                 del /f /q c:\cfn\\install\workstation.conf              
@@ -188,22 +222,24 @@ Resources:
                 adServiceAccountPassword: !Ref adServiceAccountPassword
                 domainName: !Ref domainName
                 adServiceAccountUsername: !Ref adServiceAccountUsername
+                FloatDNSName: !Ref FloatDNSName
+                SMBShareName: !Ref SMBShareName
               source: !Join ["", [!Ref RootURL, "cfn-init/workstation.conf"]]
             "C:\\cfn\\install\\workstationsetup.ps1":
               authentication: rolebased
               source: !Join ["", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
+            "C:\\cfn\\install\\set-wallpaper.ps1":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/set-wallpaper.ps1"]]    
             "C:\\mapdrive.ps1":
               content: !Sub |
                 New-PSDrive -Name Q -PSProvider FileSystem -Root "\\${FloatDNSName}\${SMBShareName}" -Scope Global -Persist
-            "C:\\cfn\\install\\install-chrome.ps1":
-              authentication: rolebased
-              source: !Join ["", [!Ref RootURL, "cfn-init/install-chrome.ps1"]]
             "C:\\cfn\\install\\launch-adobe.ps1":
               content: !Sub |
                 Start-Process -FilePath "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "https://creativecloud.adobe.com"
-            "C:\\cfn\\install\\defender-exclude.ps1":
+            "C:\\cfn\\install\\disable-defender.ps1":
               authentication: rolebased
-              source: !Join ["", [!Ref RootURL, "cfn-init/defender-exclude.ps1"]]
+              source: !Join ["", [!Ref RootURL, "cfn-init/disable-defender.ps1"]]
           services:
             windows:
               cfn-hup:
@@ -217,34 +253,39 @@ Resources:
             "01-setup-workstation":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\workstationsetup.ps1 -WorkstationConf c:\\cfn\\install\\workstation.conf"
               waitAfterCompletion: "forever"
-            "02-configure-task-map-drive":
+            "02-configure-task-set-wallpaper":
+              command: !Join 
+                - ""
+                - - "schtasks /create /tn \"Set Wallpaper\" /ru \""
+                  - !Ref domainName
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File C:\\cfn\\install\\set-wallpaper.ps1\""
+              waitAfterCompletion: 0
+            "03-configure-task-map-drive":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Map Q Drive\" /ru \""
                   - !Ref domainName
-                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File c:\\mapdrive.ps1\""
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File c:\\mapdrive.ps1\""
               waitAfterCompletion: 0
-            "03-install-chrome":
-              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\install-chrome.ps1"
-              waitAfterCompletion: 10
             "04-configure-task-launch-adobe":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Launch Adobe Webpage\" /ru \""
                   - !Ref domainName
-                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File c:\\cfn\\install\\launch-adobe.ps1\""
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File c:\\cfn\\install\\launch-adobe.ps1\""
               waitAfterCompletion: 0
-            "05-configure-task-defender-exclude":
+            "05-configure-task-disable-defender":
               command: !Join 
                 - ""
-                - - "schtasks /create /tn \"Exclude Defender Q Drive\" /ru \""
+                - - "schtasks /create /tn \"Disable Defender\" /ru \""
                   - !Ref domainName
-                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -File C:\\cfn\\install\\defender-exclude.ps1 -DomainControllerSecrets "
+                  - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File C:\\cfn\\install\\disable-defender.ps1 -DomainControllerSecrets "
                   - !Ref DomainControllerSecretsName
                   - " -DomainName "
                   - !Ref domainName
                   - "\" /rl HIGHEST"
-            "06-cleanup-files":
+              waitAfterCompletion: 0
+            "07-cleanup-files":
               command: "C:\\cfn\\install\\CleanupFiles.cmd"
               waitAfterCompletion: 0
 
@@ -257,17 +298,31 @@ Resources:
         - NetworkInterfaceId: !Ref WorkstationNI
           DeviceIndex: 0
       KeyName: !Ref gfxworkstationKeyName
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: '100'
+            DeleteOnTermination: 'true'
+            Encrypted: 'false'
       Tags:
         - Key: Name
           Value: !If
-            - FirstWS
-            - !Sub "${AWS::StackName}- Windows Adobe Workstation #${WorkstationNumber}"
+            - ProvVPC
             - !Join
               - "-"
               - - !Select [0, !Split ["-", !Ref "AWS::StackName"]]
                 - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
                 - !Select [2, !Split ["-", !Ref "AWS::StackName"]]
-                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"
+                - !Select [3, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [4, !Split ["-", !Ref "AWS::StackName"]]                                    
+                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"  
+            - !Join
+              - "-"
+              - - !Select [0, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [1, !Split ["-", !Ref "AWS::StackName"]]
+                - !Select [2, !Split ["-", !Ref "AWS::StackName"]]
+                - !Sub " Windows Adobe Workstation #${WorkstationNumber}"    
 
       UserData:
         Fn::Base64: !Sub |
@@ -379,6 +434,15 @@ Resources:
       Name: !Sub "${AWS::StackName}-RootURL"
       Value: !Ref RootURL
       Type: String
+
+  BuccketNameSSM: 
+    Type: AWS::SSM::Parameter
+    Condition: FirstWS
+    Properties:
+      Name: !Sub "${AWS::StackName}-BucketName"
+      Value: !Ref BucketName
+      Type: String
+
 
 Outputs:
   GFXWorkstationHostname:

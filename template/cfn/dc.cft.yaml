@@ -40,6 +40,8 @@ Parameters:
     Type: String
   recordName:
     Type: String
+  BucketName:
+    Type: String
 
 Conditions:
   KeyNameDefined: !Not
@@ -75,8 +77,8 @@ Resources:
                 Resource: !Join
                   - ""
                   - - "arn:aws:s3:::"
-                    - !Select [0, !Split [".", !Select [1, !Split ["//", !Ref RootURL]]]]
-                    - "*"
+                    - !Ref BucketName
+                    - "/*"
   DomainControllerWaitCondition:
     Type: "AWS::CloudFormation::WaitCondition"
     DependsOn:
@@ -301,8 +303,6 @@ Resources:
       VpcId: !Ref DirectoryServerVPC
 
 Outputs:
-  DirectoryServerHostname:
-    Value: !GetAtt DomainController.PublicDnsName
 
   DirectoryserverPrivateIP:
     Value: !GetAtt DomainController.PrivateIp

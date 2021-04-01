@@ -115,6 +115,7 @@
                     "Parameters": [
                         "InstanceType",
                         "KeyName",
+                        "FloatingIPCount",
                         "VolumesEncryptionKey",
                         "IamInstanceProfile"
                     ]
@@ -150,6 +151,9 @@
                 "ClusterName": {
                     "default": "Qumulo cluster name"
                 },
+                "FloatingIPCount": {
+                    "default": "EC2 Secondary IPs"
+                },
                 "IamInstanceProfile": {
                     "default": "IAM Instance Profile"
                 },
@@ -178,6 +182,46 @@
         }
     },
     "Outputs": {
+        "AWSStackID": {
+            "Description": "AWS ARN for this stack",
+            "Value": {
+                "Ref": "AWS::StackId"
+            }
+        },
+        "AWSStackName": {
+            "Description": "AWS Name for this stack",
+            "Value": {
+                "Ref": "AWS::StackName"
+            }
+        },
+        "ClusterInstanceIDs": {
+            "Description": "List of the instance IDs of the nodes in your Qumulo Cluster",
+            "Value": {
+                "Fn::Join": [
+                    ", ",
+                    [
+                        {
+                            "Ref": "QumuloNode1"
+                        },
+                        {
+                            "Ref": "QumuloNode2"
+                        },
+                        {
+                            "Ref": "QumuloNode3"
+                        },
+                        {
+                            "Ref": "QumuloNode4"
+                        }
+                    ]
+                ]
+            }
+        },
+        "ClusterPlacementGroup": {
+            "Description": "The placement group created for the cluster",
+            "Value": {
+                "Ref": "QClusterGroup"
+            }
+        },
         "ClusterPrivateIPs": {
             "Description": "List of the primary private IPs of the nodes in your Qumulo Cluster",
             "Value": {
@@ -212,14 +256,20 @@
                 ]
             }
         },
+        "ClusterSGID": {
+            "Description": "The security group being used by the cluster network interfaces",
+            "Value": {
+                "Ref": "QumuloSecurityGroup"
+            }
+        },
         "ClusterSecondaryPrivateIPs": {
-            "Description": "List of the secondary private IPs for your Qumulo Cluster",
+            "Description": "List of the secondary private IPs of the nodes in your Qumulo Cluster",
             "Value": {
                 "Fn::Join": [
                     ", ",
                     [
                         {
-                           "Fn::Join": [
+                            "Fn::Join": [
                                 ", ",
                                 {
                                     "Fn::GetAtt": [
@@ -230,7 +280,7 @@
                             ]
                         },
                         {
-                           "Fn::Join": [
+                            "Fn::Join": [
                                 ", ",
                                 {
                                     "Fn::GetAtt": [
@@ -241,7 +291,7 @@
                             ]
                         },
                         {
-                           "Fn::Join": [
+                            "Fn::Join": [
                                 ", ",
                                 {
                                     "Fn::GetAtt": [
@@ -252,7 +302,7 @@
                             ]
                         },
                         {
-                           "Fn::Join": [
+                            "Fn::Join": [
                                 ", ",
                                 {
                                     "Fn::GetAtt": [
@@ -261,54 +311,6 @@
                                     ]
                                 }
                             ]
-                        }     
-                    ]               
-                ]
-            }
-        },     
-        "ClusterSGID": {
-            "Description": "Security Group for your Qumulo Cluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "QumuloSecurityGroup"
-                        }
-                    ]
-                ]
-            }
-        },
-        "ClusterInstanceIDs": {
-            "Description": "List of the EC2 instance IDs of your Qumulo Cluster",
-            "Value": {
-                "Fn::Join": [
-                    ", ",
-                    [
-                        {
-                            "Ref": "QumuloNode1"
-                        },
-                        {
-                            "Ref": "QumuloNode2"
-                        },
-                        {
-                            "Ref": "QumuloNode3"
-                        },
-                        {
-                            "Ref": "QumuloNode4"
-                        }
-                    ]
-                ]
-            }
-        },
-        "ClusterPlacementGroup": {
-            "Description": "Placement Group Name for your Qumulo Cluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "QClusterGroup"
                         }
                     ]
                 ]
@@ -358,6 +360,24 @@
             "Description": "Qumulo cluster name (2-15 alpha-numeric characters and -)",
             "MaxLength": 15,
             "MinLength": 2,
+            "Type": "String"
+        },
+        "FloatingIPCount": {
+            "AllowedValues": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10"
+            ],
+            "Default": "0",
+            "Description": "Optionally enter the number of EC2 Secondary IPs to configure for use as Floating IPs on the Qumulo Cluster.",
             "Type": "String"
         },
         "IamInstanceProfile": {
@@ -629,6 +649,12 @@
             },
             "Type": "AWS::CloudWatch::Alarm"
         },
+        "QClusterGroup": {
+            "Properties": {
+                "Strategy": "cluster"
+            },
+            "Type": "AWS::EC2::PlacementGroup"
+        },
         "QumuloEni1": {
             "Properties": {
                 "GroupSet": [
@@ -636,7 +662,9 @@
                         "Ref": "QumuloSecurityGroup"
                     }
                 ],
-                "SecondaryPrivateIpAddressCount": 3,
+                "SecondaryPrivateIpAddressCount": {
+                    "Ref": "FloatingIPCount"
+                },
                 "SubnetId": {
                     "Ref": "SubnetId"
                 }
@@ -650,7 +678,9 @@
                         "Ref": "QumuloSecurityGroup"
                     }
                 ],
-                "SecondaryPrivateIpAddressCount": 3,
+                "SecondaryPrivateIpAddressCount": {
+                    "Ref": "FloatingIPCount"
+                },
                 "SubnetId": {
                     "Ref": "SubnetId"
                 }
@@ -664,7 +694,9 @@
                         "Ref": "QumuloSecurityGroup"
                     }
                 ],
-                "SecondaryPrivateIpAddressCount": 3,
+                "SecondaryPrivateIpAddressCount": {
+                    "Ref": "FloatingIPCount"
+                },
                 "SubnetId": {
                     "Ref": "SubnetId"
                 }
@@ -678,18 +710,14 @@
                         "Ref": "QumuloSecurityGroup"
                     }
                 ],
-                "SecondaryPrivateIpAddressCount": 3,
+                "SecondaryPrivateIpAddressCount": {
+                    "Ref": "FloatingIPCount"
+                },
                 "SubnetId": {
                     "Ref": "SubnetId"
                 }
             },
             "Type": "AWS::EC2::NetworkInterface"
-        },
-        "QClusterGroup": {
-            "Properties": {
-                "Strategy": "cluster"
-            },
-            "Type": "AWS::EC2::PlacementGroup"
         },
         "QumuloNode1": {
             "Properties": {
@@ -870,6 +898,22 @@
                 "PlacementGroupName": {
                     "Ref": "QClusterGroup"
                 },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                " - ",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "QumuloNode1"
+                                ]
+                            ]
+                        }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -950,23 +994,7 @@
                             ]
                         ]
                     }
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Fn::Join": [
-                                "",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                        " - Qumulo Node1"
-                                ]
-                            ]
-                        }
-                    }
-                ]
+                }
             },
             "Type": "AWS::EC2::Instance"
         },
@@ -1148,7 +1176,23 @@
                 ],
                 "PlacementGroupName": {
                     "Ref": "QClusterGroup"
-                },       
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                " - ",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "QumuloNode2"
+                                ]
+                            ]
+                        }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -1194,23 +1238,7 @@
                             ]
                         ]
                     }
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Fn::Join": [
-                                "",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                        " - Qumulo Node2"
-                                ]
-                            ]
-                        }
-                    }
-                ]
+                }
             },
             "Type": "AWS::EC2::Instance"
         },
@@ -1392,7 +1420,23 @@
                 ],
                 "PlacementGroupName": {
                     "Ref": "QClusterGroup"
-                },          
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                " - ",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "QumuloNode3"
+                                ]
+                            ]
+                        }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -1438,23 +1482,7 @@
                             ]
                         ]
                     }
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Fn::Join": [
-                                "",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                        " - Qumulo Node3"
-                                ]
-                            ]
-                        }
-                    }
-                ]
+                }
             },
             "Type": "AWS::EC2::Instance"
         },
@@ -1636,7 +1664,23 @@
                 ],
                 "PlacementGroupName": {
                     "Ref": "QClusterGroup"
-                },         
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                " - ",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "QumuloNode4"
+                                ]
+                            ]
+                        }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -1682,23 +1726,7 @@
                             ]
                         ]
                     }
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Fn::Join": [
-                                "",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                        " - Qumulo Node4"
-                                ]
-                            ]
-                        }
-                    }
-                ]
+                }
             },
             "Type": "AWS::EC2::Instance"
         },
