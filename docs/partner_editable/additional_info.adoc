@@ -4,29 +4,58 @@
 == Test the deployment
 // If steps are required to test the deployment, add them here. If not, remove the heading
 
-. Check the *Outputs* section of the workstation stack and copy the GFXWorkstationHostname value.
+. If you don't already have the Teradici client installed, check the *Outputs* section of the main stack and navigate to the TeradiciPCoIPClientURL.
 
 [#test1]
-.Workstation stack outputs
+.Teradici PCoIP Client download URL
 image::../images/image1.png[Architecture,width=100%,height=100%]
 
 [start=2]
-. Open an RDP client and paste the GFXWorkstationHostname value.
+. Download and install the Teradici client.
+. Check the *Outputs* section of the workstation stack and copy the value for GFXWorkstationHostname.
 
 [#test2]
-.RDP session
-image::../images/image2.png[Architecture,width=50%,height=50%]
-
-[start=3]
-. Enter one of the test users' usernames and the password you entered when deploying the Quick Start.
-
-[#test3]
-.StudioQ username and password
-image::../images/image3.png[Architecture,width=50%,height=50%]
+.Workstation host address
+image::../images/image2.png[Architecture,width=100%,height=100%]
 
 [start=4]
-. After logging into the workstation, open File Explorer and verify that the Q: drive is present.
+. Launch the Teradici client and paste the GFXWorkstationHostname value into the *hostname* field.
+
+[#test3]
+.Teradici PCoIP client
+image::../images/image3.png[Architecture,width=100%,height=100%]
+
+[start=5]
+. Click *Next*. If prompted with a certificate warning, select *Connect Insecurely*
 
 [#test4]
-.Q drive
-image::../images/image4.png[Architecture,width=100%,height=100%]
+.Certificate warning
+image::../images/image4.png[Architecture,width=50%,height=50%]
+
+[start=6]
+. Enter the credentials selected when launching the Quick Start and click *LOGIN*.
+
+[#test5]
+.Teradici login
+image::../images/image5.png[Architecture,width=50%,height=50%]
+
+[start=7]
+. If you entered one of the temporary user credentials, you should be brought to a Windows login screen. Use the *Connection* menu to send CTRL + ALT + DEL.
+
+[#test6]
+.Workstation welcome screen
+image::../images/image7.png[Architecture,width=100%,height=100%]
+
+[start=8]
+. If this is your first time logging in you will be asked to change your password.
+
+[#test7]
+.Password reset warning
+image::../images/image8.png[Architecture,width=100%,height=100%]
+
+[start=9]
+. After logging into the workstation, open File Explorer and verify that the Q: drive has been mapped.
+
+[#test8]
+.Q: drive mapped
+image::../images/image9.png[Architecture,width=100%,height=100%]

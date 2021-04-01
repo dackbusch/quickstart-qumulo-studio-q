@@ -15,13 +15,7 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 
 *A.* Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template-size limitations. For more information, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas^].
 
-*Q.* I am unable to establish an RDP session to the GFX workstation.
-
-*A.* Navigate to the https://console.aws.amazon.com/ec2/v2/home?region=us-east-1[EC2 Console]. Select the GFX workstation instance and open its associated EC2 Security Group. Verify that an inbound rule exists to allow RDP access (port 3389) from your Internet IP address.
-
-
 == Troubleshooting
 
 If the stack has deployed successfully but the shared network drive is unavailable, make sure the provisioning server was able to successfully complete its
-post-deployment steps. You can SSH into the provisioning server and check the log files at /var/log. Also ensure the .PEM file saved in Secrets Manager is
-the same key pair that was selected for the KeyPair parameter.
+post-deployment steps. You can SSH into the provisioning server and check the log files at /var/log.
