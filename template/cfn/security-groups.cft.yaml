@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates several Security Groups for use in subsequent stacks
+
+Parameters:
+  VpcId:
+    Type: String
+  VpcCidr:
+    Type: String
+  PublicRemoteCidr:
+    Type: String
+
+Resources:
+ 
+  AllowInternalSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Allow VPC Internal"
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VpcCidr
+      VpcId: !Ref VpcId
+
+  AllowRdpSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Allow Teradici PCoIP
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref PublicRemoteCidr
+        - IpProtocol: tcp
+          FromPort: 4172
+          ToPort: 4172
+          CidrIp: !Ref PublicRemoteCidr
+        - IpProtocol: udp
+          FromPort: 4172
+          ToPort: 4172
+          CidrIp: !Ref PublicRemoteCidr
+        - IpProtocol: udp
+          FromPort: 5986
+          ToPort: 5986
+          CidrIp: !Ref VpcCidr
+      VpcId: !Ref VpcId
+
+  AllowQumuloSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Allow Qumulo
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 3712
+          ToPort: 3712
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 21
+          ToPort: 21
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: udp
+          FromPort: 2049
+          ToPort: 2049
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 111
+          ToPort: 111
+          CidrIp: !Ref VpcCidr
+      VpcId: !Ref VpcId
+
+Outputs:
+  AllowQumuloSGId:
+    Value: !Ref AllowQumuloSG
+  AllowRdpSGId:
+    Value: !Ref AllowRdpSG
+  AllowInternalSGId:
+    Value: !Ref AllowInternalSG
+

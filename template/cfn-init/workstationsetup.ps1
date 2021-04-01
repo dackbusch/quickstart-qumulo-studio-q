@@ -24,6 +24,8 @@ $admin_password = $content[2]
 $ad_service_account_password = $content[3]
 $domainname = $content[4]
 $adServiceAccountUsername = $content[5]
+$FloatDNSName = $content[6]
+$SMBShareName = $content[7]
 
 $global:restart = $false
 
@@ -266,6 +268,61 @@ Join-Domain
 "Adding domain users to remote desktop users"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Domain Users"
 Add-LocalGroupmember -Group "Administrators" -Member "Domain Users"
+
+# Install Chrome
+$Path = $env:TEMP
+$Installer = "chrome_installer.exe"
+Invoke-WebRequest "http://dl.google.com/chrome/chrome_installer.exe" -OutFile $Path\$Installer
+Start-Process -FilePath $Path\$Installer -Args "/silent /install" -Verb RunAs -Wait
+Remove-Item $Path\$Installer
+
+$Path = $env:TEMP
+$Installer = "s3browser-9-5-5.exe"
+Invoke-WebRequest "https://netsdk.s3.amazonaws.com/s3browser/9.5.5/s3browser-9-5-5.exe" -OutFile $Path\$Installer
+Start-Process -FilePath $Path\$Installer -Args "/VERYSILENT /install /NORESTART" -Verb RunAs -Wait
+Remove-Item $Path\$Installer
+
+# Add Link to Qumulo UI
+$WshShell = New-Object -comObject WScript.Shell
+$path = "C:\Users\Public\Desktop\Qumulo-UI.url"
+$targetpath = "https://" + $FloatDNSName + "." + $domainname
+$iconlocation = "C:\cfn\install\qumulo.ico"
+$iconfile = "IconFile=" + $iconlocation
+$Shortcut = $WshShell.CreateShortcut($path)
+$Shortcut.TargetPath = $targetpath
+$Shortcut.Save()
+Add-Content $path "HotKey=0"
+Add-Content $path "$iconfile"
+Add-Content $path "IconIndex=0"
+
+# Add Link to Qumulo KB
+$WshShell2 = New-Object -comObject WScript.Shell
+$path2 = "C:\Users\Public\Desktop\Qumulo-KB.url"
+$targetpath2 = "https://care.qumulo.com"
+$iconlocation2 = "C:\cfn\install\qumulo.ico"
+$iconfile2 = "IconFile=" + $iconlocation2
+$Shortcut2 = $WshShell2.CreateShortcut($path2)
+$Shortcut2.TargetPath = $targetpath2
+$Shortcut2.Save()
+Add-Content $path2 "HotKey=0"
+Add-Content $path2 "$iconfile2"
+Add-Content $path2 "IconIndex=0"
+
+# Add Link for SMB Share on Qumulo
+$WshShell3 = New-Object -comObject WScript.Shell
+$path3 = "C:\Users\Public\Desktop\adobe-projects.url"
+$targetpath3 = "\\" + $FloatDNSName + "\" + $SMBShareName
+$iconlocation3 = "C:\cfn\install\disk.ico"
+$iconfile3 = "IconFile=" + $iconlocation3
+$Shortcut3 = $WshShell3.CreateShortcut($path3)
+$Shortcut3.TargetPath = $targetpath3
+$Shortcut3.Save()
+Add-Content $path3 "HotKey=0"
+Add-Content $path3 "$iconfile3"
+Add-Content $path3 "IconIndex=0"
+
+# Delete Extraneous Shortcuts
+Remove-Item "C:\Users\Public\Desktop\Teradici Website.url"
 
 "Restarting Workstation"
 Restart-Computer -Force

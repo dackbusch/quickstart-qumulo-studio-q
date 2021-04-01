@@ -23,7 +23,6 @@ Resources:
               - Effect: Allow
                 Action:
                   - "ec2:*"
-                  - "cloudformation:*"
                   - "cloudwatch:*"
                   - "kms:*"
                   - "s3:*"

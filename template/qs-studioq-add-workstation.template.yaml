@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: This template adds an Adobe Workstation an existing StudioQ Quick Start VPC
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Add Additional Workstation
+        Parameters:
+          - WorkstationStackName
+          - WorkstationNumber
+          - windowsGrxInstanceType
+
+    ParameterLabels:
+      WorkstationStackName:
+        default: "Name of an active CloudFormation stack for a previous Adobe Workstation #1"
+      WorkstationNumber:
+        default: "Worksation Instance Number"
+      windowsGrxInstanceType:
+        default: "AWS Teradici Instance Type"
+
+Parameters:
+  WorkstationStackName:
+    Description: "Copy from the Output of the StudioQ top-level template. Example: studioq-WORKSTATIONSTACK-xxxxxxxxxxxx. Subsequent WORKSTATIONSTACKn names will not work."
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+    Default: ""
+
+  WorkstationNumber:
+    Description: "Tags the instance name with the number (2-10)"
+    AllowedPattern: '[0-9]*'
+    MinLength: 1
+    MaxLength: 2
+    Type: String
+    Default: "2"
+
+  windowsGrxInstanceType:
+    AllowedValues:
+      - g4dn.xlarge
+      - g4dn.2xlarge
+      - g4dn.4xlarge
+      - g4dn.8xlarge
+      - g4dn.16xlarge
+    Description: "Adobe Editorial Personas: 2xlarge = News/Simple Edit, 4xlarge = Creative, 8xlarge = Promo"
+    Type: String
+    Default: "g4dn.2xlarge"
+
+Resources:
+
+  PsuedoSecretName:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Type: String
+      Value: !Sub "{{resolve:ssm:${WorkstationStackName}-DomainControllerSecretsName:1}}"
+
+  WORKSTATIONSTACK:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: PsuedoSecretName
+    Properties:
+      Parameters:
+        FirstStation: "FALSE"
+        WorkstationNumber: !Ref WorkstationNumber
+        adServiceAccountPassword: !Sub 
+          - "{{resolve:secretsmanager:${SecretName}:SecretString:adServiceAccountPassword}}"
+          - SecretName: !GetAtt PsuedoSecretName.Value
+
+        adServiceAccountUsername: !Sub
+          - "{{resolve:secretsmanager:${SecretName}:SecretString:adServiceAccountUsername}}"
+          - SecretName: !GetAtt PsuedoSecretName.Value
+
+        workstationAdminPassword: !Sub
+          - "{{resolve:secretsmanager:${SecretName}:SecretString:adServiceAccountPassword}}"
+          - SecretName: !GetAtt PsuedoSecretName.Value
+
+        domainName: !Sub "{{resolve:ssm:${WorkstationStackName}-domainName:1}}" 
+        gfxworkstationKeyName: !Sub "{{resolve:ssm:${WorkstationStackName}-gfxworkstationKeyName:1}}" 
+        gfxworkstationSG: !Sub "{{resolve:ssm:${WorkstationStackName}-gfxworkstationSG:1}}"  
+        gfxworkstationSubnet: !Sub "{{resolve:ssm:${WorkstationStackName}-gfxworkstationSubnet:1}}"  
+        pcoipAgentFilename: "null"
+        pcoipAgentLocationUrl: !Sub "{{resolve:ssm:${WorkstationStackName}-pcoipAgentLocationUrl:1}}"  
+        pcoipRegistrationCode: !Sub "{{resolve:ssm:${WorkstationStackName}-pcoipRegistrationCode:1}}" 
+        windowsGrxInstanceType: !Ref windowsGrxInstanceType
+        SMBShareName: !Sub "{{resolve:ssm:${WorkstationStackName}-SMBShareName:1}}"
+        FloatDNSName: !Sub "{{resolve:ssm:${WorkstationStackName}-FloatDNSName:1}}" 
+        DomainControllerSecretsName: !Sub "{{resolve:ssm:${WorkstationStackName}-DomainControllerSecretsName:1}}"
+        BucketName: !Sub "{{resolve:ssm:${WorkstationStackName}-BucketName:1}}"
+        RootURL: !Sub "{{resolve:ssm:${WorkstationStackName}-RootURL:1}}"
+      TemplateURL: !Join 
+        - ""
+        - - !Sub "{{resolve:ssm:${WorkstationStackName}-RootURL:1}}"
+          - "cfn/gfx-workstation.cft.yaml"   
+      TimeoutInMinutes: 150
+
+Outputs:
+  GFXWorkstationPublicIP:
+    Description: "Public IP for Adobe Workstation"
+    Value: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationPublicIP
+
+  GFXWorkstationNumber:
+    Description: "Workstation Instance Number"
+    Value: !Ref WorkstationNumber
+

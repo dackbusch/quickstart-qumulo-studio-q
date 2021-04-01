@@ -39,4 +39,7 @@ Install-WindowsFeature RSAT-ADDS
 $content = Get-Content $UserFile
 $UserPS = $content[0]
 $PassPS = ConvertTo-SecureString $content[1] -AsPlainText -Force
-New-ADUser -Name $UserPS -AccountPassword $PassPS -PasswordNeverExpires:$false -ChangePasswordAtLogon:$false -Enabled:$true
+For ($i=1; $i -lt 21; $i++) {
+	$UserName = $($UserPS) + $($i)
+	New-ADUser -Name $UserName -AccountPassword $PassPS -PasswordNeverExpires:$false -ChangePasswordAtLogon:$true -Enabled:$true
+}
