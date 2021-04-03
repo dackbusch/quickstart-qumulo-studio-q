@@ -232,6 +232,7 @@ Parameters:
       If empty, the default KMS EBS key will be used. Choosing an invalid key name
       will cause the instance to fail to launch.
     Type: String
+    Default: ''
  
   QInstanceRecoveryTopic:
     Description: Optionally enter the ARN of an SNS topic that receives messages when an instance alarm is triggered.
@@ -409,7 +410,7 @@ Resources:
         AvailabilityZone: !Ref AvailabilityZone
       TemplateURL:
         !Sub
-          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/cfn/aws-vpc.cft.yaml
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/aws-vpc.cft.yaml
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       TimeoutInMinutes: 150
@@ -452,7 +453,7 @@ Resources:
         windowsGrxInstanceType: !Ref windowsGrxInstanceType
       TemplateURL:
         !Sub
-          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}template/qs-studioq-main.template.yaml
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/qs-studioq-main.template.yaml
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
 Outputs:
