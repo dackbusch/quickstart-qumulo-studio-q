@@ -15,9 +15,37 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 
 *A.* Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template-size limitations. For more information, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas^].
 
-
 == Troubleshooting
 
-If the stack has deployed successfully but the shared network drive is unavailable, make sure the provisioning server was able to successfully complete its
-post-deployment steps. You can SSH into the provisioning server and check the log files at /var/log. Also ensure the .PEM file saved in Secrets Manager is
-the same key pair that was selected for the KeyPair parameter.
+First, confirm if the provisiner node successfully shutdown by inspecting the AWS Console EC2 instances and filtering on the stack name.  Make sure to clear the *running instances* filter.  The provisioner instance should automatically shutdown around the time the main stack completes.
+
+The stack may deploy successfully but if the provisioner instance is not able to successfully complete its post-deployment steps several issues may occur:
+
+[start=1]
+. The SMB Share may not exist rendering the Q:\ drive unusable.
+
+[start=2]
+. The cluster may not be joined to the AD domain
+
+[start=3]
+. The EBS volumes may not be tagged with the stack name
+
+[start=4]
+. The link to the Qumulo UI on the workstation desktop may not work
+
+Any and all of these may occur.  The most likely cause of failure is a failure in local DNS resolution or the ability to reach public IP addresses.  This is extremely unlikely to happen if the template was deployed creating a new VPC.  If the template was deployed into an existing VPC root causes of these failures may be:
+
+[start=1]
+. The existing VPC does not have a functioning NAT gateway and the provisioning node is unable to reach public IP addresses for AWS services
+
+[start=2]
+. The existing VPC does not have route tables correctly configured for public and private subnets in relation to an Internet Gateway and NAT Gateway
+
+[start=3]
+. The existing VPC has Network ACLs that are blocking traffic.
+
+[start=4]
+. The existing VPC has *dhcpoptions* that are miss configured for the AD server that the stack deployed causing DNS resolution issues. Update the *dhcpoptions* for the VPC.
+
+[start=5]
+. The existing VPC already had an AD server and the addition of the AD server the stack created is causing issues.
