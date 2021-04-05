@@ -4,12 +4,11 @@
 
 // Space needed to maintain table headers
 |VPCs |1
-|Elastic IP addresses |2
-|Security groups |8
-|AWS Identity and Access Management (IAM) roles |4
-|Network Load Balancers |1
-|m5.2xlarge instances |4
-|t2.small instances |1
-|g4dn instances !1
+|Elastic IP addresses |1 for NAT Gateway, plus 1 per Workstations
+|Security groups |6
+|AWS Identity and Access Management (IAM) roles |5, plus 1 per Workstation
+|m5.2xlarge, m5.4xlarge, m5.8xlarge, or c5n.9xlarge instances |4
+|t3.large instances |2
+|g4dn.2xlarge, g4dn.4xlarge, g4dn.8xlarge, or g4dn.16xlarge instances |1 per workstation
 |Lambda functions |2
 |===
