@@ -8,13 +8,6 @@ Metadata:
     Order: "2"
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      - Label:
-          default: AWS Quick Start Configuration
-        Parameters:
-          - QSS3BucketName
-          - QSS3BucketRegion
-          - QSS3KeyPrefix
-          - KeyPair
 
       - Label: 
           default: AWS Network Configuration
@@ -64,6 +57,14 @@ Metadata:
           - DirectoryServerAmi
           - domainName
           - qumuloFloatRecordName
+
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+          - KeyPair
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
 
     ParameterLabels:
       QSS3BucketName:

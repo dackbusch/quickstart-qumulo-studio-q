@@ -5,6 +5,6 @@
 
 This Quick Start assumes only a basic knowledge of the Windows environment and no previous knowledge of Qumulo or Teradici.
 
-To customize the configuration of the Qumulo cluster refer to: https://care.qumulo.com/hc/en-us/[Qumulo Care^]
+To customize the configuration of the Qumulo cluster refer to: https://care.qumulo.com/hc/en-us/[Qumulo Care^].
 
-To customize the configuration for Teradici PCoIP refer to: https://help.teradici.com/s/knowledge/[Teradici Knowledge Center^]
+To customize the configuration for Teradici PCoIP refer to: https://help.teradici.com/s/knowledge/[Teradici Knowledge Center^].

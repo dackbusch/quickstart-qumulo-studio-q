@@ -801,11 +801,17 @@ a img {
 <li><a href="#_deployment_steps">Deployment steps</a>
 <ul class="sectlevel2">
 <li><a href="#_sign_in_to_your_aws_account">Sign in to your AWS account</a></li>
-<li><a href="#_subscribe_to_the_studio_q_ami">Subscribe to the Studio Q AMI</a></li>
+<li><a href="#_subscribe_to_the_marketplace_amis">Subscribe to the Marketplace AMIs</a></li>
 <li><a href="#_launch_the_quick_start">Launch the Quick Start</a></li>
 </ul>
 </li>
 <li><a href="#_test_the_deployment">Test the deployment</a></li>
+<li><a href="#_post_deployment_steps">Post-deployment steps</a>
+<ul class="sectlevel2">
+<li><a href="#_set_default_browser">Set default browser</a></li>
+<li><a href="#_log_into_qumulo_dashboard">Log into Qumulo dashboard</a></li>
+</ul>
+</li>
 <li><a href="#_adding_another_workstation_after_initial_deployment">Adding Another Workstation after Initial Deployment</a></li>
 <li><a href="#_upgrading_the_qumulo_cluster">Upgrading The Qumulo Cluster</a></li>
 <li><a href="#_upgrading_the_sidecar_lambda_functions">Upgrading the Sidecar Lambda Functions</a></li>
@@ -832,7 +838,7 @@ a img {
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>March, 2021</strong><br>
+<p><strong>April, 2021</strong><br>
 <em>Dack Busch, Qumulo</em><br>
 <em>Troy Ameigh and Dave May, AWS Quick Start team</em></p>
 </div>
@@ -883,7 +889,7 @@ collaborated with AWS on the content of the Quick Start.
 <h2 id="_studio_q_on_aws">Studio Q on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Studio Q Quick Start is focused on rapidly building a complete non-linear editing environment for remote editorial creative teams.  Qumulo&#8217;s File Data Platform forms the file data foundation so all files are available to all editors for collaborative editorial workflows.  For this Quick Start 1TB and 12TB usable capacity options are available.  Workstations are built on the powerful AWS g4dn family of instances with nVidia T4 GPUs and a Teradici PCoIP agent per workstation.  With the Studio Q solution, editors have the same editorial experience as if all their resources were local.</p>
+<p>The Studio Q Quick Start is focused on rapidly building a complete non-linear editing environment for remote editorial creative teams.  Qumulo&#8217;s File Data Platform forms the file data foundation so all files are available to all editors for collaborative editorial workflows.  For this Quick Start 1TB and 12TB usable capacity options are available.  Workstations are built on the powerful AWS g4dn family of Elastic Cloud Compute (EC2) instances with nVidia T4 GPUs and a Teradici PCoIP agent per workstation.  With the Studio Q solution, editors have the same editorial experience as if all their resources were local.</p>
 </div>
 <div class="paragraph">
 <p>Qumulo is a high-performance, multi-protocol File Data Platform with Petabyte scale for billions of files in a single name space on AWS.  If larger editorial envrionments are of interest please contact Qumulo at: ??? or AWS at ???</p>
@@ -984,10 +990,10 @@ internet access for resources in the private subnet.*</p>
 <div class="ulist">
 <ul>
 <li>
-<p>1TB usable capacity: 24x 100GiB EBS gp2 volumes</p>
+<p>1TB usable capacity: 24x 100GiB EBS gp2 volumes.</p>
 </li>
 <li>
-<p>12TB usable capacity: 20x 100GiB EBS gp2 volumes and 40x 500GiB EBS st1 volumes</p>
+<p>12TB usable capacity: 20x 100GiB EBS gp2 volumes and 40x 500GiB EBS st1 volumes.</p>
 </li>
 </ul>
 </div>
@@ -1013,20 +1019,23 @@ internet access for resources in the private subnet.*</p>
 <p>All workstations and the Qumulo cluster are joined to the AD domain automatically.</p>
 </li>
 <li>
-<p>The AD server also provides all DNS services local to the VPC forwarding public requests to R53.</p>
+<p>The AD server also provides all DNS services local to the VPC forwarding public requests to Route53.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>A provisioner instance that configures:</p>
+<p>A temporary provisioner instance that performs the following:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Qumulo cluster users, roles, IP failover, an SMB share, and joins the cluster to the AD domain.</p>
+<p>Creates Qumulo cluster users, roles, IP failover, and an SMB share.</p>
 </li>
 <li>
-<p>Tags all EBS volumes with the Stack Name and modifies the KMS Customer Managed Key (CMK) policy if a CMK is specified in the template.</p>
+<p>Joins the cluster to the AD domain.</p>
+</li>
+<li>
+<p>Tags all EBS volumes with the CloudFormation stack name and modifies the KMS Customer Managed Key (CMK) policy if a CMK is specified in the template.</p>
 </li>
 </ul>
 </div>
@@ -1059,10 +1068,10 @@ Cloud.</p>
 <p>This Quick Start assumes only a basic knowledge of the Windows environment and no previous knowledge of Qumulo or Teradici.</p>
 </div>
 <div class="paragraph">
-<p>To customize the configuration of the Qumulo cluster refer to: <a href="https://care.qumulo.com/hc/en-us/" target="_blank" rel="noopener">Qumulo Care</a></p>
+<p>To customize the configuration of the Qumulo cluster refer to: <a href="https://care.qumulo.com/hc/en-us/" target="_blank" rel="noopener">Qumulo Care</a>.</p>
 </div>
 <div class="paragraph">
-<p>To customize the configuration for Teradici PCoIP refer to: <a href="https://help.teradici.com/s/knowledge/" target="_blank" rel="noopener">Teradici Knowledge Center</a></p>
+<p>To customize the configuration for Teradici PCoIP refer to: <a href="https://help.teradici.com/s/knowledge/" target="_blank" rel="noopener">Teradici Knowledge Center</a>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1102,7 +1111,7 @@ Cloud.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Elastic IP addresses</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 for NAT Gateway, plus 1 per Workstations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 for NAT Gateway, plus 1 for each workstation</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Security groups</p></td>
@@ -1110,7 +1119,7 @@ Cloud.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AWS Identity and Access Management (IAM) roles</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5, plus 1 per Workstation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5, plus 1 for each workstation</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">m5.2xlarge, m5.4xlarge, m5.8xlarge, or c5n.9xlarge instances</p></td>
@@ -1122,7 +1131,7 @@ Cloud.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">g4dn.2xlarge, g4dn.4xlarge, g4dn.8xlarge, or g4dn.16xlarge instances</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 per workstation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 for each workstation</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda functions</p></td>
@@ -1279,7 +1288,7 @@ When deploying into an existing VPC this Quick Start will deploy the Active Dire
 </div>
 </div>
 <div class="sect2">
-<h3 id="_subscribe_to_the_studio_q_ami">Subscribe to the Studio Q AMI</h3>
+<h3 id="_subscribe_to_the_marketplace_amis">Subscribe to the Marketplace AMIs</h3>
 <div class="paragraph">
 <p>This Quick Start requires a subscription to the AMI for Studio Q in AWS Marketplace.</p>
 </div>
@@ -1464,7 +1473,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </div>
 <div id="test4" class="imageblock">
 <div class="content">
-<img src="images/image4.png" alt="Architecture" width="50%" height="50%">
+<img src="images/image4.png" alt="Architecture" width="25%" height="25%">
 </div>
 <div class="title">Figure 6. Certificate warning</div>
 </div>
@@ -1542,7 +1551,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </div>
 <div id="test10" class="imageblock">
 <div class="content">
-<img src="images/image9.png" alt="Architecture" width="500%" height="500%">
+<img src="images/image9.png" alt="Architecture" width="50%" height="50%">
 </div>
 <div class="title">Figure 12. Q: Drive mapped to Qumulo</div>
 </div>
@@ -1578,10 +1587,17 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </div>
 <div class="title">Figure 15. Windows Local Server</div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_post_deployment_steps">Post-deployment steps</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_set_default_browser">Set default browser</h3>
 <div class="olist arabic">
-<ol class="arabic" start="13">
+<ol class="arabic" start="1">
 <li>
-<p>Now go to the upper right corner of the Chrome Browser and select settings, default browser, make default, and finally select Chrome as the default browser.  Close the settings window.</p>
+<p>Go to the upper right corner of the Chrome Browser and select settings, default browser, make default, and finally select Chrome as the default browser.  Close the settings window.</p>
 </li>
 </ol>
 </div>
@@ -1609,10 +1625,13 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </div>
 <div class="title">Figure 19. Chrome Select as Default Browser</div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_log_into_qumulo_dashboard">Log into Qumulo dashboard</h3>
 <div class="olist arabic">
-<ol class="arabic" start="14">
+<ol class="arabic" start="1">
 <li>
-<p>Now click on the link on the desktop to the <strong>Qumulo UI</strong> and accept the self-signed certificate by clicking <strong>Advanced</strong> and then <strong>Proceed to &#8230;&#8203;</strong>.  If you want to replace the self-signed certificate see <a href="https://care.qumulo.com/hc/en-us/articles/115015388507-SSL-Install-a-Signed-SSL-Certificate" target="_blank" rel="noopener">Install a Signed SSL Certificate</a> from Qumulo.</p>
+<p>Click on the link on the desktop to the <strong>Qumulo UI</strong> and accept the self-signed certificate by clicking <strong>Advanced</strong> and then <strong>Proceed to &#8230;&#8203;</strong>.  If you want to replace the self-signed certificate see <a href="https://care.qumulo.com/hc/en-us/articles/115015388507-SSL-Install-a-Signed-SSL-Certificate" target="_blank" rel="noopener">Install a Signed SSL Certificate</a> from Qumulo.</p>
 </li>
 </ol>
 </div>
@@ -1623,9 +1642,9 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 20. Qumulo Self-Signed Cert</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="15">
+<ol class="arabic" start="2">
 <li>
-<p>This is not an AD login but a user has been created with the same AD default credentials and given read-only priveleges to view all settings and activity on the cluster.  Enter your Active Directory Base Account Name and the default password.  Note, no number is appended to the user name for this login.</p>
+<p>This is not an AD login but a user that has been created with the same AD default credentials and given read-only priveleges to view all settings and activity on the cluster.  Enter your Active Directory Base Account Name and the default password. Note, no number is appended to the user name for this login.</p>
 </li>
 </ol>
 </div>
@@ -1636,7 +1655,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 21. Qumulo UI Login</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="16">
+<ol class="arabic" start="3">
 <li>
 <p>You will now see the Qumulo Dashboard.  It will display either 1.3TB usable or 12TB usable depending on your chosen configuration at template launch.</p>
 </li>
@@ -1662,7 +1681,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 23. Qumulo Cluster Overview</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="18">
+<ol class="arabic" start="4">
 <li>
 <p>In the same window click in to any one of the four nodes.  The Drive details should show all drives as healthy.  The drives are the EBS volumes connected to the specific node (EC2 instance) you selected.</p>
 </li>
@@ -1675,7 +1694,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 24. Qumulo Cluster Node 1 Details</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="19">
+<ol class="arabic" start="5">
 <li>
 <p>Select <strong>Cluster &#8594; Network Configuration</strong>.  The <strong>Search Domains</strong> should show your FQDN.  Each of the 4 nodes will show a persistent IP (EC2 Primary IP) and three floating IPs (EC2 Secondary IPs) for IP failover.</p>
 </li>
@@ -1688,7 +1707,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 25. Qumulo Network Configuration</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="20">
+<ol class="arabic" start="6">
 <li>
 <p>Select <strong>Cluster &#8594; Active Directory</strong>.  At the top of the window you should see that the Cluster with the name you gave it has joined the FQDN of your domain</p>
 </li>
@@ -1701,7 +1720,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 26. Qumulo Active Directory</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="21">
+<ol class="arabic" start="7">
 <li>
 <p>Select <strong>Cluster &#8594; SMB Shares</strong>.  Here you will see the share <strong>adobe-projects</strong> has been created.  Use this share for all video content and subsequent editing in Adobe Premiere Pro.</p>
 </li>
@@ -1714,11 +1733,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="title">Figure 27. Qumulo SMB Shares</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="21">
+<ol class="arabic" start="8">
 <li>
-<p>At this point all of the Studio Q infrastructure is setup and confirmed to be properly configured.  You may move content on to the Qumulo cluster using the <strong>S3 Browser</strong> link on the desktop or any other preferred S3 utility and simply drop the content in the Q:\ drive.  All workstations and all users will have access to the Q:\ drive.  Further, if you chose to create multiple workstations you may login to those using the credentials established in this first Teradici session.  Any user can login to any workstation because they are authenticated with AD.  There are 20 users created by default, e.g. studioqUser1, studioqUser2, &#8230;&#8203; studioqUser20.  At first login every user will need to change their password.</p>
+<p>At this point all of the Studio Q infrastructure is set up and confirmed to be properly configured.  You may move content on to the Qumulo cluster using the <strong>S3 Browser</strong> link on the desktop or any other preferred S3 utility and simply drop the content in the Q:\ drive.  All workstations and all users will have access to the Q:\ drive. Further, if you chose to create multiple workstations you may login to those using the credentials established in this first Teradici session. Any user can login to any workstation because they are authenticated with AD. There are 20 users created by default, e.g. studioqUser1, studioqUser2, &#8230;&#8203; studioqUser20. At first login every user will need to change their password.</p>
 </li>
 </ol>
+</div>
 </div>
 </div>
 </div>
@@ -1744,7 +1764,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_launch_permalink" target="_blank" rel="noopener">Deploy Studio Q additional Workstation</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_template_permalink" target="_blank" rel="noopener">View template</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/aws-quickstart/quickstart-qumulo-studio-q/blob/main/templates/qs-studioq-add-workstation.cft.yaml" target="_blank" rel="noopener">View template</a></p></td>
 </tr>
 </tbody>
 </table>
