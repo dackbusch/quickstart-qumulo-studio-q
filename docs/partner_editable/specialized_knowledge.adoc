@@ -3,4 +3,8 @@
 // Include links if helpful. 
 // You don't need to list AWS services or point to general info about AWS; the boilerplate already covers this.
 
-This Quick Start also assumes familiarity with <knowledge expectations specific to this Quick Start>.
+This Quick Start assumes only a basic knowledge of the Windows environment and no previous knowledge of Qumulo or Teradici.
+
+To customize the configuration of the Qumulo cluster refer to: https://care.qumulo.com/hc/en-us/[Qumulo Care^]
+
+To customize the configuration for Teradici PCoIP refer to: https://help.teradici.com/s/knowledge/[Teradici Knowledge Center^]

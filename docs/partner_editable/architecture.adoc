@@ -1,5 +1,4 @@
-Deploying this Quick Start for a new virtual private cloud (VPC) with
-default parameters builds the following {partner-product-short-name} environment in the
+Deploying this Quick Start for a new virtual private cloud (VPC) builds the following {partner-product-short-name} environment in the
 AWS Cloud.
 
 // Replace this example diagram with your own. Send us your source PowerPoint file. Be sure to follow our guidelines here : http://(we should include these points on our contributors giude)
@@ -13,15 +12,25 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 * A VPC configured with public and private subnets, according to AWS
 best practices, to provide you with your own virtual network on AWS.*
 * In the public subnet:
-** A managed network address translation (NAT) gateway to allow outbound
+** A managed network address translation (NAT) gateway to allow outbound.
 internet access for resources in the private subnet.*
-** A network load balancer to divide network traffic among the Qumulo cluster nodes.
-* In the private subnets:
-** A cluster of four Qumulo EC2 instances.
-** An Amazon Elastic Block Store (EBS) shared drive.
-** Lambda functions to monitor and report on the Qumulo environment.
-** An EC2 instance acting as an Active Directory domain controller.
-** One or more EC2 instances running Teradici for streaming editorial workspace environments via PCoIP.
+** One or more EC2 g4dn instances running Windows Server 2019.
+*** Teradici PCoIP is installed for streaming the editorial workspace to remote editors.
+*** Windows is configured in an optimized fashion for Adobe Premiere Pro with a pop-up per boot cycle for Adobe Creative Cloud login.
+* In the private subnet:
+** A cluster of four Qumulo EC2 instances providing 1TB or 12TB of usable capacity.
+** Multiple Amazon Elastic Block Store (EBS) volumes connected to the Qumulo cluster.
+*** 1TB usable capacity: 24x 100GiB EBS gp2 volumes
+*** 12TB usable capacity: 20x 100GiB EBS gp2 volumes and 40x 500GiB EBS st1 volumes
+** Two Lambda functions to monitor and report on the Qumulo environment.
+*** One Lambda function sends metrics for the Qumulo cluster to CloudWatch.
+*** The other Lambda function monitors the health of EBS volumes and autmatically replaces any unhealthy volumes.
+** An EC2 t3.large instance acting as an Active Directory domain controller and local DNS server.
+*** All workstations and the Qumulo cluster are joined to the AD domain automatically.
+*** The AD server also provides all DNS services local to the VPC forwarding public requests to R53.
+** A provisioner instance that configures:
+*** Qumulo cluster users, roles, IP failover, an SMB share, and joins the cluster to the AD domain.
+*** Tags all EBS volumes with the Stack Name and modifies the KMS Customer Managed Key (CMK) policy if a CMK is specified in the template.
 // Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram. End each bullet with a period.
 
 [.small]#*The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
