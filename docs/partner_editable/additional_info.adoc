@@ -30,7 +30,7 @@ image::../images/image3.png[Architecture,width=100%,height=100%]
 
 [#test4]
 .Certificate warning
-image::../images/image4.png[Architecture,width=50%,height=50%]
+image::../images/image4.png[Architecture,width=25%,height=25%]
 
 [start=5]
 . Check to see if the Teradici Client recognizes the Active Directory Domain Name entered in the template.  Workstations take ~10 minutes to boot and configure from template completion. If the domain name is not present close the Teradici window and repeat steps 3 and 4.
@@ -47,7 +47,7 @@ image::../images/image5.png[Architecture,width=100%,height=100%]
 image::../images/image6.png[Architecture,width=1000%,height=100%]
 
 [start=7]
-. If you entered one of the temporary user credentials, you should be brought to a Windows login screen. Use the *Connection* menu to send CTRL + ALT + DEL.
+. If you entered one of the temporary user credentials, you should be brought to a Windows login screen. Use the *Connection* menu to send CTRL + ALT + DEL.  Note: On a Mac the *Connection* menu is in the *menubar* at the top of the screen.
 
 [#test7]
 .Workstation welcome screen
@@ -72,7 +72,7 @@ image::../images/desktop.png[Architecture,width=100%,height=100%]
 
 [#test10]
 .Q: Drive mapped to Qumulo
-image::../images/image9.png[Architecture,width=500%,height=500%]
+image::../images/image9.png[Architecture,width=50%,height=50%]
 
 [start=11]
 . Now open the Windows launch view and select Server Manager.
@@ -91,8 +91,12 @@ image::../images/server_manager.png[Architecture,width=100%,height=100%]
 .Windows Local Server
 image::../images/local_server.png[Architecture,width=100%,height=100%]
 
-[start=13]
-. Now go to the upper right corner of the Chrome Browser and select settings, default browser, make default, and finally select Chrome as the default browser.  Close the settings window.
+== Post-deployment steps
+
+=== Set default browser
+
+[start=1]
+. Go to the upper right corner of the Chrome Browser and select settings, default browser, make default, and finally select Chrome as the default browser.  Close the settings window.
 
 [#test13]
 .Chrome Settings
@@ -107,22 +111,24 @@ image::../images/chrome_make.png[Architecture,width=100%,height=100%]
 .Chrome Select as Default Browser
 image::../images/chrome_select.png[Architecture,width=100%,height=100%]
 
-[start=14]
-. Now click on the link on the desktop to the *Qumulo UI* and accept the self-signed certificate by clicking *Advanced* and then *Proceed to ...*.  If you want to replace the self-signed certificate see https://care.qumulo.com/hc/en-us/articles/115015388507-SSL-Install-a-Signed-SSL-Certificate[Install a Signed SSL Certificate^] from Qumulo.
+=== Log into Qumulo dashboard
+
+[start=1]
+. Click on the link on the desktop to the *Qumulo UI* and accept the self-signed certificate by clicking *Advanced* and then *Proceed to ...*.  If you want to replace the self-signed certificate see https://care.qumulo.com/hc/en-us/articles/115015388507-SSL-Install-a-Signed-SSL-Certificate[Install a Signed SSL Certificate^] from Qumulo.
 
 [#test14]
 .Qumulo Self-Signed Cert
 image::../images/qumulo_cert.png[Architecture,width=100%,height=100%]
 
-[start=15]
-. This is not an AD login but a user has been created with the same AD default credentials and given read-only priveleges to view all settings and activity on the cluster.  Enter your Active Directory Base Account Name and the default password.  Note, no number is appended to the user name for this login.
+[start=2]
+. This is not an AD login but a user that has been created with the same AD default credentials and given read-only priveleges to view all settings and activity on the cluster.  Enter your Active Directory Base Account Name and the default password. Note, no number is appended to the user name for this login.
 
 [#test15]
 .Qumulo UI Login
 image::../images/qumulo_login.png[Architecture,width=100%,height=100%]
 
-[start=16]
-. You will now see the Qumulo Dashboard.  It will display either 1.3TB usable or 12TB usable depending on your chosen configuration at template launch.
+[start=3]
+. You will now see the Qumulo Dashboard.  It will display either 1.3TB usable or 12.6TB usable depending on your chosen configuration at template launch.
 
 [#test16]
 .Qumulo Dashboard
@@ -135,36 +141,36 @@ image::../images/qumulo_dashboard.png[Architecture,width=100%,height=100%]
 .Qumulo Cluster Overview
 image::../images/qumulo_cluster.png[Architecture,width=100%,height=100%]
 
-[start=18]
+[start=4]
 . In the same window click in to any one of the four nodes.  The Drive details should show all drives as healthy.  The drives are the EBS volumes connected to the specific node (EC2 instance) you selected.
 
 [#test18]
 .Qumulo Cluster Node 1 Details
 image::../images/qumulo_ebs.png[Architecture,width=100%,height=100%]
 
-[start=19]
+[start=5]
 . Select *Cluster -> Network Configuration*.  The *Search Domains* should show your FQDN.  Each of the 4 nodes will show a persistent IP (EC2 Primary IP) and three floating IPs (EC2 Secondary IPs) for IP failover.
 
 [#test19]
 .Qumulo Network Configuration
 image::../images/qumulo_network.png[Architecture,width=100%,height=100%]
 
-[start=20]
+[start=6]
 . Select *Cluster -> Active Directory*.  At the top of the window you should see that the Cluster with the name you gave it has joined the FQDN of your domain
 
 [#test20]
 .Qumulo Active Directory
 image::../images/qumulo_ad.png[Architecture,width=100%,height=100%]
 
-[start=21]
+[start=7]
 . Select *Cluster -> SMB Shares*.  Here you will see the share *adobe-projects* has been created.  Use this share for all video content and subsequent editing in Adobe Premiere Pro.
 
 [#test21]
 .Qumulo SMB Shares
 image::../images/qumulo_smb.png[Architecture,width=100%,height=100%]
 
-[start=21]
-. At this point all of the Studio Q infrastructure is setup and confirmed to be properly configured.  You may move content on to the Qumulo cluster using the *S3 Browser* link on the desktop or any other preferred S3 utility and simply drop the content in the Q:\ drive.  All workstations and all users will have access to the Q:\ drive.  Further, if you chose to create multiple workstations you may login to those using the credentials established in this first Teradici session.  Any user can login to any workstation because they are authenticated with AD.  There are 20 users created by default, e.g. studioqUser1, studioqUser2, ... studioqUser20.  At first login every user will need to change their password.
+[start=8]
+. At this point all of the Studio Q infrastructure is set up and confirmed to be properly configured.  You may move content on to the Qumulo cluster using the *S3 Browser* link on the desktop or any other preferred S3 utility and simply drop the content in the Q:\ drive.  All workstations and all users will have access to the Q:\ drive. Further, if you chose to create multiple workstations you may login to those using the credentials established in this first Teradici session. Any user can login to any workstation because they are authenticated with AD. There are 20 users created by default, e.g. studioqUser1, studioqUser2, ... studioqUser20. At first login every user will need to change their password.
 
 == Adding Another Workstation after Initial Deployment
 
@@ -175,7 +181,7 @@ In the initial deployment 1 to 10 workstations may be deployed.  If another work
 [cols="3,1"]
 |===
 ^|http://qs_launch_permalink[Deploy {partner-product-short-name} additional Workstation^]
-^|http://qs_template_permalink[View template^]
+^|https://github.com/aws-quickstart/quickstart-qumulo-studio-q/blob/main/templates/qs-studioq-add-workstation.cft.yaml[View template^]
 |===
 
 [start=2]
