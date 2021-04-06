@@ -15,6 +15,10 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 
 *A.* Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template-size limitations. For more information, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas^].
 
+*Q.* I forgot what passwords I entered in the CloudFormation template.
+
+*A.* In the AWS console navigate to *Secrets Manaager*.  The passwords entered in the CloudFormation template are stored under *<stackname>-SECRETSSTACK...-DomainControllerSecrets*.  Selecting *Retrieve secret value* will reveal the usernames and passwords for the AD server.
+
 == Troubleshooting
 
 First, confirm if the provisiner node successfully shutdown by inspecting the AWS Console EC2 instances and filtering on the stack name.  Make sure to clear the *running instances* filter.  The provisioner instance should automatically shutdown around the time the main stack completes.
@@ -45,7 +49,7 @@ Any and all of these may occur.  The most likely cause of failure is a failure i
 . The existing VPC has Network ACLs that are blocking traffic.
 
 [start=4]
-. The existing VPC has *dhcpoptions* that are miss configured for the AD server that the stack deployed causing DNS resolution issues. Update the *dhcpoptions* for the VPC.
+. The existing VPC has *DHCP Options* that are miss configured for the AD server that the stack deployed causing DNS resolution issues. Review the *DHCP Options* created by the stack and other option sets in the VPC and rectify.
 
 [start=5]
 . The existing VPC already had an AD server and the addition of the AD server the stack created is causing issues.
