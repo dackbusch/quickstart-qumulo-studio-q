@@ -11,7 +11,7 @@ ifdef::marketplace_subscription[]
 This Quick Start requires a subscription to the AMI for {partner-product-short-name} in AWS Marketplace.
 
 . Sign in to your AWS account.
-. Open https://aws.amazon.com/marketplace/server/procurement?productId=edeb9751-4819-40ad-a593-04b6572694e7[the page for the Qumulo 1TB usable capacity AMI in AWS Marketplace] or open https://aws.amazon.com/marketplace/server/procurement?productId=ffcf6347-ca3c-4ed8-b009-b954f01444f6[the page for the Qumulo 12TB usable capacity AMI in AWS Marketplace], and then choose *Continue to Subscribe*.  Both offers may be accepted.  You will only be charged for what is deployed.
+. Open https://aws.amazon.com/marketplace/server/procurement?productId=edeb9751-4819-40ad-a593-04b6572694e7[the page for the Qumulo 1TB usable capacity AMI in AWS Marketplace^] or open https://aws.amazon.com/marketplace/server/procurement?productId=ffcf6347-ca3c-4ed8-b009-b954f01444f6[the page for the Qumulo 12TB usable capacity AMI in AWS Marketplace^], and then choose *Continue to Subscribe*.  Both offers may be accepted.  You only be charged for what is deployed.
 . Review the terms and conditions for software usage, and then choose *Accept Terms*. +
   A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the https://aws.amazon.com/marketplace/help/200799470[AWS Marketplace documentation^].
   When the subscription process is complete, continue to step 4. *Do not* provision the software from AWS Marketplace—the Quick Start deploys the AMI for you.
@@ -29,7 +29,7 @@ WARNING: If you’re deploying {partner-product-short-name} into an existing VPC
 
 Each deployment takes about {deployment_time} to complete.
 
-. Sign in to your AWS account, and choose one of the following options to launch the AWS CloudFormation template. For help with choosing an option, see link:#_deployment_options[Deployment options] earlier in this guide.
+. Sign in to your AWS account, and choose one of the following options to launch the AWS CloudFormation template. For help with choosing an option, see link:#_deployment_options[Deployment options], earlier in this guide.
 
 [cols="3,1"]
 |===
