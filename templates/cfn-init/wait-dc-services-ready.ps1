@@ -34,3 +34,10 @@ while ($status -ne "Running")
   Start-Sleep 10
   $status = (Get-Service -Name dns -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 }
+
+$status = (Get-Service -Name ADWS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+while ($status -ne "Running")
+{
+  Start-Sleep 10
+  $status = (Get-Service -Name ADWS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+}
