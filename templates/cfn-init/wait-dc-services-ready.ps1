@@ -41,3 +41,5 @@ while ($status -ne "Running")
   Start-Sleep 10
   $status = (Get-Service -Name ADWS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 }
+
+Start-Sleep 90

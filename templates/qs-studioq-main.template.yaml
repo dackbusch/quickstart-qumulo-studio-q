@@ -497,7 +497,7 @@ Resources:
         testusername: !Ref testusername
         testuserpassword: !Ref testuserpassword
         dcAdminPassword: !Ref dcAdminPassword
-        dcInstanceType: "t3.large"
+        dcInstanceType: "m5.large"
         domainName: !Ref domainName
         safeModeAdminPassword: !Ref safeModeAdminPassword
         floatIPs: !GetAtt QSTACK.Outputs.ClusterSecondaryPrivateIPs

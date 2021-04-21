@@ -221,7 +221,7 @@ Resources:
               waitAfterCompletion: forever
             "05-wait-reboot":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\wait-dc-services-ready.ps1"
-              waitAfterCompletion: "60"
+              waitAfterCompletion: "300"
             "06-add-svcaccount":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\add-svcaccount.ps1 -PasswordFile c:\\cfn\\install\\svcaccount.conf"
               waitAfterCompletion: "10"
