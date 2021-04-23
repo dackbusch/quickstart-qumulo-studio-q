@@ -7,9 +7,9 @@ AWS Cloud.
 .Quick Start architecture for {partner-product-short-name} on AWS
 image::../images/architecture_diagram.png[Architecture,width=100%,height=100%]
 
-As shown in <<aws-quickstart-graphic>>, the Quick Start sets up the following:
+As shown in <<architecture1>>, the Quick Start sets up the following:
 
-* A virtual private cloud (VPC) configured with public and private subnets, according to AWS
+* A VPC configured with public and private subnets, according to AWS
 best practices, to provide you with your own virtual network on AWS.*
 * In the public subnet:
 ** A managed network address translation (NAT) gateway to allow outbound.
@@ -25,7 +25,7 @@ internet access for resources in the private subnet.*
 ** Two Lambda functions to monitor and report on the Qumulo environment.
 *** One Lambda function sends metrics for the Qumulo cluster to CloudWatch.
 *** The other Lambda function monitors the health of EBS volumes and autmatically replaces any unhealthy volumes.
-** An EC2 t3.large instance acting as an Active Directory domain controller and local DNS server.
+** An EC2 m5.large instance acting as an Active Directory domain controller and local DNS server.
 *** All workstations and the Qumulo cluster are joined to the AD domain automatically.
 *** The AD server also provides all DNS services local to the VPC forwarding public requests to Route53.
 ** A temporary provisioner instance that performs the following:

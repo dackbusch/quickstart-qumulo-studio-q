@@ -8,7 +8,8 @@
 |Security groups |6
 |AWS Identity and Access Management (IAM) roles |5, plus 1 for each workstation
 |m5.2xlarge, m5.4xlarge, m5.8xlarge, or c5n.9xlarge instances |4
-|t3.large instances |2
+|m5.large instances |1
+|t3.large instances |1
 |g4dn.2xlarge, g4dn.4xlarge, g4dn.8xlarge, or g4dn.16xlarge instances |1 for each workstation
 |Lambda functions |2
 |===

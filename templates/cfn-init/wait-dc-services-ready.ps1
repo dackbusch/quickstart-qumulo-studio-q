@@ -24,22 +24,53 @@ Import-Module ServerManager
 $status = (Get-Service -Name NTDS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 while ($status -ne "Running")
 {
+  "AD Server: Checking NTDS"
   Start-Sleep 10
   $status = (Get-Service -Name NTDS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 }
+"AD Server NTDS Alive"
 
 $status = (Get-Service -Name dns -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 while ($status -ne "Running")
 {
+  "AD Server: Checking DNS"
   Start-Sleep 10
   $status = (Get-Service -Name dns -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 }
+"AD Server DNS Alive"
 
 $status = (Get-Service -Name ADWS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 while ($status -ne "Running")
 {
+  "AD Server: Checking ADWS"
   Start-Sleep 10
   $status = (Get-Service -Name ADWS -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
 }
+"AD Server ADWS Alive"
 
-Start-Sleep 90
+$status = (Get-Service -Name kdc -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+while ($status -ne "Running")
+{
+  "AD Server: Checking KDC"
+  Start-Sleep 10
+  $status = (Get-Service -Name kdc -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+}
+"AD Server KDC Alive"
+
+$status = (Get-Service -Name netlogon -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+while ($status -ne "Running")
+{
+  "AD Server: Checking NetLogon"
+  Start-Sleep 10
+  $status = (Get-Service -Name netlogon -ErrorAction SilentlyContinue | Select -ExpandProperty Status)
+}
+"AD Server NetLogon Alive"
+
+$status = (Get-ADDomainController -Discover -Service "GlobalCatalog" -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
+while ($status -ne "DC")
+{
+  	"AD Server: Checking GlobalCatalog"
+	Start-Sleep 10
+	$status = (Get-ADDomainController -Discover -Service "GlobalCatalog" -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
+}
+"AD Server GlobalCatalog Alive"

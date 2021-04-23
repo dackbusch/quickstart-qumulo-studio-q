@@ -221,16 +221,16 @@ Resources:
               waitAfterCompletion: forever
             "05-wait-reboot":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\wait-dc-services-ready.ps1"
-              waitAfterCompletion: "300"
+              waitAfterCompletion: "5"
             "06-add-svcaccount":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\add-svcaccount.ps1 -PasswordFile c:\\cfn\\install\\svcaccount.conf"
-              waitAfterCompletion: "10"
+              waitAfterCompletion: "5"
             "07-add-domainuser":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\create-user.ps1 -UserFile c:\\cfn\\install\\user.conf"
-              waitAfterCompletion: "20"
+              waitAfterCompletion: "5"
             "08-add-arecords":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\create-arecords.ps1 -ConfigFile c:\\cfn\\install\\arecord-info.conf"
-              waitAfterCompletion: "60"
+              waitAfterCompletion: "5"
             "09-cleanup-files":
               command: "C:\\cfn\\install\\CleanupFiles.cmd"
               waitAfterCompletion: "0"
