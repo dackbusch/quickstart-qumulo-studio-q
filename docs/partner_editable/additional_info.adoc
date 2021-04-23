@@ -4,6 +4,7 @@
 == Test the deployment
 // If steps are required to test the deployment, add them here. If not, remove the heading
 
+[start=1]
 . If you don't already have the Teradici client installed, check the *Outputs* section of the main stack and navigate to the TeradiciPCoIPClientURL.
 
 [#test1]
@@ -18,76 +19,77 @@ image::../images/image1.png[Architecture,width=100%,height=100%]
 .Workstation host address
 image::../images/image2.png[Architecture,width=100%,height=100%]
 
-[start=3]
+[start=4]
 . Launch the Teradici client and paste the WorkstationPublicIP1 value into the *hostname* field. The *Connection Name* is optional but if entered and *SAVE*d the public IP will be stored with a shortcut on subsequent Teradici client launches.
 
 [#test3]
 .Teradici PCoIP client
 image::../images/image3.png[Architecture,width=100%,height=100%]
 
-[start=4]
+[start=5]
 . Click *Next*. If prompted with a certificate warning, select *Connect Insecurely*. To replace the self-signed certificate see https://www.teradici.com/web-help/pcoip_connection_manager_security_gateway/19.08/security/creating_cmsg_cert/[Creating, Installing, and Managing Certificates^] from Teradici.
 
 [#test4]
 .Certificate warning
 image::../images/image4.png[Architecture,width=25%,height=25%]
 
-[start=5]
+[start=6]
 . Check to see if the Teradici Client recognizes the Active Directory Domain Name entered in the template.  Workstations take ~10 minutes to boot and configure from template completion. If the domain name is not present close the Teradici window and repeat steps 3 and 4.
 
 [#test5]
 .Teradici login with valid AD Domain
 image::../images/image5.png[Architecture,width=100%,height=100%]
 
-[start=6]
+[start=7]
 . Enter the Active Directory Accounts Base Username plus the number of the workstation to connect to, and the default password for AD accounts that were entered when launching the Quick Start and click *LOGIN*.
 
 [#test6]
 .Teradici login user name and default password
 image::../images/image6.png[Architecture,width=1000%,height=100%]
 
-[start=7]
+[start=8]
 . If you entered one of the temporary user credentials, you should be brought to a Windows login screen. Use the *Connection* menu to send CTRL + ALT + DEL.  Note: On a Mac the *Connection* menu is in the *menubar* at the top of the screen.
 
 [#test7]
 .Workstation welcome screen
 image::../images/image7.png[Architecture,width=100%,height=100%]
 
-[start=8]
+[start=9]
 . If this is your first time logging in you will be asked to enter your credentials again and then prompted to change your password.
 
 [#test8]
 .Password reset warning
 image::../images/image8.png[Architecture,width=100%,height=100%]
 
-[start=9]
+[start=10]
 . After logging into the workstation, you will see the following desktop.
 
 [#test9]
 .Studio Q Desktop
 image::../images/desktop.png[Architecture,width=100%,height=100%]
 
-[start=10]
+[start=11]
 . Open File Explorer and verify that the Q: drive has been mapped.
 
 [#test10]
 .Q: Drive mapped to Qumulo
 image::../images/image9.png[Architecture,width=50%,height=50%]
 
-[start=11]
+[start=12]
 . Now open the Windows launch view and select Server Manager.
 
 [#test11]
 .Windows Launch View
 image::../images/windows.png[Architecture,width=50%,height=50%]
 
-[start=12]
+[start=13]
 . Select *Local Server*, and then verify that Windows Defender Antivirus has the status *Windows Real-time Protection: Off*
 
 [#test12]
 .Windows Server Manager
 image::../images/server_manager.png[Architecture,width=100%,height=100%]
 
+[#test13]
 .Windows Local Server
 image::../images/local_server.png[Architecture,width=100%,height=100%]
 
@@ -134,42 +136,42 @@ image::../images/qumulo_login.png[Architecture,width=100%,height=100%]
 .Qumulo Dashboard
 image::../images/qumulo_dashboard.png[Architecture,width=100%,height=100%]
 
-[start=17]
+[start=4]
 . Select *Cluster*.  Four nodes will be displayed numbered 1 through 4.  These are each of your EC2 instances.
 
 [#test17]
 .Qumulo Cluster Overview
 image::../images/qumulo_cluster.png[Architecture,width=100%,height=100%]
 
-[start=4]
+[start=5]
 . In the same window click in to any one of the four nodes.  The Drive details should show all drives as healthy.  The drives are the EBS volumes connected to the specific node (EC2 instance) you selected.
 
 [#test18]
 .Qumulo Cluster Node 1 Details
 image::../images/qumulo_ebs.png[Architecture,width=100%,height=100%]
 
-[start=5]
+[start=6]
 . Select *Cluster -> Network Configuration*.  The *Search Domains* should show your FQDN.  Each of the 4 nodes will show a persistent IP (EC2 Primary IP) and three floating IPs (EC2 Secondary IPs) for IP failover.
 
 [#test19]
 .Qumulo Network Configuration
 image::../images/qumulo_network.png[Architecture,width=100%,height=100%]
 
-[start=6]
+[start=7]
 . Select *Cluster -> Active Directory*.  At the top of the window you should see that the Cluster with the name you gave it has joined the FQDN of your domain
 
 [#test20]
 .Qumulo Active Directory
 image::../images/qumulo_ad.png[Architecture,width=100%,height=100%]
 
-[start=7]
+[start=8]
 . Select *Cluster -> SMB Shares*.  Here you will see the share *adobe-projects* has been created.  Use this share for all video content and subsequent editing in Adobe Premiere Pro.
 
 [#test21]
 .Qumulo SMB Shares
 image::../images/qumulo_smb.png[Architecture,width=100%,height=100%]
 
-[start=8]
+[start=9]
 . At this point all of the Studio Q infrastructure is set up and confirmed to be properly configured.  You may move content on to the Qumulo cluster using the *S3 Browser* link on the desktop or any other preferred S3 utility and simply drop the content in the Q:\ drive.  All workstations and all users will have access to the Q:\ drive. Further, if you chose to create multiple workstations you may login to those using the credentials established in this first Teradici session. Any user can login to any workstation because they are authenticated with AD. There are 20 users created by default, e.g. studioqUser1, studioqUser2, ... studioqUser20. At first login every user will need to change their password.
 
 == Adding Another Workstation after Initial Deployment
