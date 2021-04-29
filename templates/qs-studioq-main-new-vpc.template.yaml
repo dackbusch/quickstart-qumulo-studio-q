@@ -25,7 +25,6 @@ Metadata:
           - VolumesEncryptionKey
           - QClusterName
           - QSgCidr
-          - ProvisioningServerAMI
           - SMBShareName
           - QInstanceRecoveryTopic
 
@@ -94,8 +93,6 @@ Metadata:
         default: "OPTIONAL: Qumulo Instance Recovery Topic"
       QSgCidr:
         default: "Qumulo Security Group"
-      ProvisioningServerAMI:
-        default: "Linux Server for Secondary Configuration of Qumulo "
       SMBShareName:
         default: "SMB Share Name "
       SideCarTemplate:
