@@ -14,7 +14,7 @@ This Quick Start requires a subscription to the Amazon Machine Image (AMI) for {
 . Open one of the following two Qumulo pages in the AWS Marketplace, and choose *Continue to Subscribe*. Regardless of which offer you choose, you are only charged for what is deployed.
 
 * https://aws.amazon.com/marketplace/server/procurement?productId=edeb9751-4819-40ad-a593-04b6572694e7[1 TB usable capacity AMI^]  
-* https://aws.amazon.com/marketplace/server/procurement?productId=ffcf6347-ca3c-4ed8-b009-b954f01444f6[12 TB usable capacity AMI^],
+* https://aws.amazon.com/marketplace/server/procurement?productId=ffcf6347-ca3c-4ed8-b009-b954f01444f6[12 TB usable capacity AMI^]
 
 . Review the terms and conditions for software usage, and then choose *Accept Terms*. +
   A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the https://aws.amazon.com/marketplace/help/200799470[AWS Marketplace documentation^].
@@ -33,7 +33,7 @@ Each deployment takes about {deployment_time} to complete.
 
 . Sign in to your AWS account, and choose one of the following options to launch the AWS CloudFormation template. For help with choosing an option, see link:#_deployment_options[Deployment options], earlier in this guide.
 
-[cols="3,1"]
+[cols="1,1"]
 |===
 ^|http://qs_launch_permalink[Deploy {partner-product-short-name} into a new VPC on AWS^]
 ^|http://qs_template_permalink[View template^]
