@@ -7,4 +7,4 @@ This Quick Start provides two deployment options:
 
 The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and {partner-product-short-name} settings, as discussed later in this guide.
 
-WARNING: When deploying into an existing VPC this Quick Start will deploy the Active Directory server as Domain Controller and all subsequent infrastructure will depend on local DNS from it.  Plan accordingly.
+WARNING: When deploying into an existing VPC, this Quick Start deploys the Active Directory server as the domain controller, and all subsequent infrastructure depends on domain controller's local DNS. Plan accordingly.
