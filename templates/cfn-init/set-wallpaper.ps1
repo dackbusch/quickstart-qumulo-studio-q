@@ -37,3 +37,8 @@ public class Params
 }
 
 Set-WallPaper -Image "C:\cfn\install\studioq-desktop.jpg"
+
+$MicKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
+Set-ItemProperty -Path $MicKey -Name Value -Value "Allow" -Force
+$MicAppsKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
+Set-ItemProperty -Path $MicAppsKey -Name Value -Value "Allow" -Force

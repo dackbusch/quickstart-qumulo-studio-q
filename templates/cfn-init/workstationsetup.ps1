@@ -291,6 +291,9 @@ Invoke-WebRequest "https://netsdk.s3.amazonaws.com/s3browser/9.5.5/s3browser-9-5
 Start-Process -FilePath $Path\$Installer -Args "/VERYSILENT /install /NORESTART" -Verb RunAs -Wait
 Remove-Item $Path\$Installer
 
+# Enable Audio Service
+Set-Service -Name Audiosrv -StartupType Automatic -Status Running
+
 # Add Link to Qumulo UI
 $WshShell = New-Object -comObject WScript.Shell
 $path = "C:\Users\Public\Desktop\Qumulo-UI.url"
