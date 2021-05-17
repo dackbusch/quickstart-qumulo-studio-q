@@ -15,41 +15,25 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 
 *A.* Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template-size limitations. For more information, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas^].
 
-*Q.* I forgot what passwords I entered in the CloudFormation template.
+*Q.* I forgot which passwords I entered in the CloudFormation template.
 
-*A.* In the AWS console navigate to *Secrets Manaager*.  The passwords entered in the CloudFormation template are stored under *<stackname>-SECRETSSTACK...-DomainControllerSecrets*.  Selecting *Retrieve secret value* will reveal the usernames and passwords for the AD server.
+*A.* In the AWS Management Console, navigate to *Secrets Manaager*. The passwords entered in the CloudFormation template are stored under *<stackname>-SECRETSSTACK...-DomainControllerSecrets*. Choose *Retrieve secret value* to locate the user names and passwords for the Active Directory server.
 
 == Troubleshooting
 
-First, confirm if the provisiner node successfully shutdown by inspecting the AWS Console EC2 instances and filtering on the stack name.  Make sure to clear the *running instances* filter.  The provisioner instance should automatically shutdown around the time the main stack completes.
+Confirm that the provisiner node successfully shut down by inspecting the EC2 instances and filtering on the stack name in the AWS Console. Make sure to clear the *running instances* filter. The provisioner instance should automatically shut down soon after the main stack completes.
 
-The stack may deploy successfully but if the provisioner instance is not able to successfully complete its post-deployment steps several issues may occur:
+Even if the stack deploys successfully, if the provisioner instance cannot successfully complete the post-deployment steps, several issues might occur:
 
-[start=1]
-. The SMB Share may not exist rendering the Q:\ drive unusable.
+* The SMB file share might not exist, which means that you cannot use the Q drive.
+* The cluster might not be joined to the Active Directory domain.
+* The EBS volumes might not be tagged with the stack name.
+* The link to Qumulo UI on the workstation desktop might not work.
 
-[start=2]
-. The cluster may not be joined to the AD domain
+Another cause of failure is with the local DNS resolution or the ability to reach public IP addresses. However, these issues are unlikely if you deployed the template into a new VPC. If the template was deployed into an existing VPC, causes of failure might include:
 
-[start=3]
-. The EBS volumes may not be tagged with the stack name
-
-[start=4]
-. The link to the Qumulo UI on the workstation desktop may not work
-
-Any and all of these may occur.  The most likely cause of failure is a failure in local DNS resolution or the ability to reach public IP addresses.  This is extremely unlikely to happen if the template was deployed creating a new VPC.  If the template was deployed into an existing VPC root causes of these failures may be:
-
-[start=1]
-. The existing VPC does not have a functioning NAT gateway and the provisioning node is unable to reach public IP addresses for AWS services
-
-[start=2]
-. The existing VPC does not have route tables correctly configured for public and private subnets in relation to an Internet Gateway and NAT Gateway
-
-[start=3]
-. The existing VPC has Network ACLs that are blocking traffic.
-
-[start=4]
-. The existing VPC has *DHCP Options* that are miss configured for the AD server that the stack deployed causing DNS resolution issues. Review the *DHCP Options* created by the stack and other option sets in the VPC and rectify.
-
-[start=5]
-. The existing VPC already had an AD server and the addition of the AD server the stack created is causing issues.
+* The existing VPC does not have a functioning NAT gateway, and the provisioning node is unable to reach public IP addresses for AWS services.
+* The existing VPC does not have route tables correctly configured for public and private subnets in relation to an internet gateway and NAT gateway.
+* The existing VPC has network access control lists (ACLs) that are blocking traffic.
+* The existing VPC has DHCP options that are misconfigured for the Active Directory server that the stack deployed, causing DNS resolution issues. Review the *DHCP Options* section to review and resolve the options created by the stack and other option sets in the VPC.
+* The existing VPC already had an Active Directory server, and now a conflict exists.
