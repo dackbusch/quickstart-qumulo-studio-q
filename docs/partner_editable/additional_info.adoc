@@ -179,9 +179,7 @@ image::../images/qumulo_smb.png[Architecture]
 The initial deployment deploys 1-10 workstations. If you want to add another workstation, follow these steps:
 
 [start=1]
-. Launch the following template:
-
-http://qs_launch_permalink[Deploy additional {partner-product-short-name} workstation^] (https://github.com/aws-quickstart/quickstart-qumulo-studio-q/blob/main/templates/qs-studioq-add-workstation.cft.yaml[View template^])
+. Launch the following template: http://qs_launch_permalink[Deploy additional {partner-product-short-name} workstation^]. You can also (https://github.com/aws-quickstart/quickstart-qumulo-studio-q/blob/main/templates/qs-studioq-add-workstation.cft.yaml[view the template^]. 
 
 [start=2]
 . From the original, top-level stack, copy the *WorkstationStackName* key value.
@@ -241,7 +239,7 @@ image::../images/qumulo_upgrade_path.png[Architecture]
 .Qumulo upgraded
 image::../images/qumulo_upgraded.png[Architecture]
 
-== Upgrading the sidecar Lambda functions
+== Upgrade the sidecar Lambda functions
 The final step in the upgrade is to update the Python code in the sidecar Lambda functions. This insures that CloudWatch metrics and EBS volume monitoring are in sync with the latest Qumulo Core software on the cluster.
 
 [start=1]
