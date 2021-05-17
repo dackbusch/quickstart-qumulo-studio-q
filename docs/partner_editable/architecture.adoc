@@ -10,7 +10,7 @@ image::../images/qumulo-architecture-diagram.png[Architecture]
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
 * A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
-* An internet gateway to allow communication between the VPC and the internet. 
+* An internet gateway to allow communication between the VPC and the internet.* 
 * In the public subnet:
 ** A managed network address translation (NAT) gateway to allow outbound internet access for resources in the private subnet.*
 ** An Elastic IP address to allow the Amazon EC2 instance to communicate with the internet.  
