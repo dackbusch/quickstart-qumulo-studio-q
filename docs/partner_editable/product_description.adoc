@@ -4,7 +4,7 @@
 
 Qumulo is a high-performance, multi-protocol file data platform for managing billions of files in a single namespace on AWS. Supporting petabyte-scale data, Qumulo's file data platform is the foundation that makes all files available to all editors for collaborative editorial workflows. 
 
-This Quick Start builds a Qumulo cluster and one or more editorial workstations all hosted on AWS with options for 1 TB and 12 TB usable capacity. Workstations are built on the AWS G4dn family of Amazon Elastic Cloud Compute (Amazon EC2) instances with NVIDIA T4 GPUs and a Teradici PCoIP agent on the workstation. You can optionally add more workstations as a post-deployment step. 
+This Quick Start builds a Qumulo cluster and one or more editorial workstations all hosted on AWS with options for 1 TB and 12 TB usable capacity. Workstations are built on the AWS G4dn family of Amazon Elastic Cloud Compute (Amazon EC2) instances with NVIDIA T4 graphics processing units (GPUs) and a Teradici PC over IP (PCoIP) agent on the workstation. You can optionally add more workstations as a post-deployment step. 
 
 With Qumulo's {partner-product-short-name} solution, editors have the same editorial experience as if they are working with local resources.
 
