@@ -301,7 +301,7 @@ Parameters:
       - "8"
       - "9"
       - "10"
-    Description: "The total number of workstations to build with the instance type above."
+    Description: "The total number of workstations to build with the instance type."
     Type: String
     Default: "1"
 
