@@ -268,7 +268,7 @@ Parameters:
 
   SideCarPassword:
     AllowedPattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&\\-_])[A-Za-z\\d@$!%*?&\\-_]{8,}$"
-    Description: "Requires a minumum 8 characters and must include one uppercase, one lowercase, and one special character."
+    Description: "Requires a minimum eight characters and must include one uppercase, one lowercase, and one special character."
     MaxLength: 128
     MinLength: 8
     Type: String
@@ -308,7 +308,7 @@ Parameters:
       - "8"
       - "9"
       - "10"
-    Description: "Specify the total number of workstations to build with the instance type above."
+    Description: "Specify the total number of workstations to build with the instance type."
     Type: String
     Default: "1"
 
@@ -334,7 +334,7 @@ Parameters:
     Default: SvcAdmin
 
   adServiceAccountPassword:
-    Description: Password for the Service Administrator user. Must be at least 8 characters containing letters, numbers and symbols.
+    Description: Password for the service administrator user. Must be at least eight characters containing letters, numbers, and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -350,7 +350,7 @@ Parameters:
     Default: administrator
 
   dcAdminPassword:
-    Description: Password for the domain administrator user. Must be at least 8 characters containing letters, numbers, and symbols.
+    Description: Password for the domain administrator user. Must be at least eight characters containing letters, numbers, and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -358,7 +358,7 @@ Parameters:
     NoEcho: "true"
 
   safeModeAdminPassword:
-    Description: Password for a separate Administrator account when the domain controller is in Restore Mode. Must be at least 8 characters containing letters, numbers and symbols.
+    Description: Password for a separate administrator account when the domain controller is in restore mode. Must be at least eight characters containing letters, numbers, and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -374,7 +374,7 @@ Parameters:
     Default: studioqUser
 
   testuserpassword:
-    Description: Default password for the Active Directory accounts that are created. Must be at least 8 characters containing letters, numbers, and symbols.
+    Description: Default password for the Active Directory accounts that are created. Must be at least eight characters containing letters, numbers, and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
