@@ -226,9 +226,9 @@ Parameters:
     Default: "m5.2xlarge"
 
   VolumesEncryptionKey: 
-    Description: The AWS KMS key to encrypt the volumes. Use either a key ID, Amazon Resource Name (ARN), or
+    Description: The AWS Key Management Service (AWS KMS) key to encrypt the volumes. Use either a key ID, Amazon Resource Name (ARN), or
       an alias. Aliases must begin with alias/ followed by the name, such as alias/exampleKey.
-      If empty, the default KMS EBS key is used. Choosing an invalid key name
+      If empty, the default Amazon EBS key is used. Choosing an invalid key name
       causes the instance to fail to launch.
     Type: String
     Default: ''
