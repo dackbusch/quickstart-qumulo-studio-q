@@ -74,7 +74,7 @@ Metadata:
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
       KeyPair:
-        default: "AWS Key-pair aame"
+        default: "AWS key pair name"
       VpcId:
         default: "AWS VPC ID"
       PublicSubnetId:
