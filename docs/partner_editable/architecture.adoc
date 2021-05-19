@@ -19,7 +19,7 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 ** A cluster of four Qumulo Core EC2 instances providing 1 or 12-TB of usable capacity.
 ** Multiple Amazon Elastic Block Store (Amazon EBS) volumes connected to the Qumulo cluster. Options include:
 *** 1-TB usable capacity option contains 24 of 100 GiB Amazon EBS General Purpose SSD (gp2) volumes.
-*** 12-TB usable capacity option contains 20 of 100 GiB Amazon EBS gp2 volumes and 40 of 500 GiB EBS Throughput Optimized HDD (st1) volumes.
+*** 12-TB usable capacity option contains 20 of 100 GiB Amazon EBS gp2 volumes and 40 of 500 GiB Amazon EBS Throughput Optimized HDD (st1) volumes.
 ** An EC2 T3 provisioner instance that is removed after provisioning Qumulo. This instance performs the following: 
 *** Creates Qumulo cluster users, roles, IP failover, and a Server Message Block (SMB) file share.
 *** Joins the cluster to the Active Directory domain.
