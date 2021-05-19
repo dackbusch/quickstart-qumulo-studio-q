@@ -17,11 +17,11 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 
 *Q.* I forgot which passwords I entered in the CloudFormation template.
 
-*A.* In the AWS Management Console, navigate to *Secrets Manaager*. The passwords entered in the CloudFormation template are stored under *<stackname>-SECRETSSTACK...-DomainControllerSecrets*. Choose *Retrieve secret value* to locate the user names and passwords for the Active Directory server.
+*A.* In the AWS Management Console, navigate to *Secrets Manager*. The passwords entered in the CloudFormation template are stored under *<stackname>-SECRETSSTACK...-DomainControllerSecrets*. Choose *Retrieve secret value* to locate the user names and passwords for the Active Directory server.
 
 == Troubleshooting
 
-Confirm that the provisiner node successfully shut down by inspecting the EC2 instances and filtering on the stack name in the AWS Console. Make sure to clear the *running instances* filter. The provisioner instance should automatically shut down soon after the main stack completes.
+Confirm that the provisioner node successfully shut down by inspecting the EC2 instances and filtering on the stack name in the AWS Management Console. Make sure to clear the *running instances* filter. The provisioner instance should automatically shut down soon after the main stack completes.
 
 Even if the stack deploys successfully, if the provisioner instance cannot successfully complete the post-deployment steps, several issues might occur:
 
