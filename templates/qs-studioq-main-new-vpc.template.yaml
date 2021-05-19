@@ -118,15 +118,15 @@ Metadata:
       dcAdminUsername:
         default: "Domain controller administrator user name "
       dcAdminPassword:
-        default: "Domain Controller administrator Password "
+        default: "Domain controller administrator password "
       safeModeAdminPassword:
-        default: "Domain Controller Safe-Mode administrator Password "
+        default: "Domain controller safe-mode administrator password "
       testusername:
-        default: "Active Directory Accounts: Base Username "
+        default: "Active Directory accounts: base user name "
       testuserpassword: 
-        default: "Active Directory Accounts: Default Password "
+        default: "Active Directory accounts: default password "
       qumuloFloatRecordName:
-        default: "DNS Record Name for Qumulo RR DNS "
+        default: "DNS record name for Qumulo Round Robin DNS "
 
 Parameters:
 
@@ -220,8 +220,8 @@ Parameters:
       - m5.4xlarge
       - m5.8xlarge
       - c5n.9xlarge
-    Description: "EC2 instance type for Qumulo nodes. Write/read max throughput in MBs for 1 TB All Flash: m5.2xlarge = 1400/2100, m5.8xlarge = 2000/2500, c5n.9xlarge = 2500/3800.  
-      Write/read max throughput in MBs for 12 TB Hybrid: m5.2xlarge = 800/2100, m5.8xlarge = 1100/2400." 
+    Description: "EC2 instance type for Qumulo nodes. Write/read max throughput in MBs for 1-TB All Flash: m5.2xlarge = 1400/2100, m5.8xlarge = 2000/2500, c5n.9xlarge = 2500/3800.  
+      Write/read max throughput in MBs for 12-TB hybrid: m5.2xlarge = 800/2100, m5.8xlarge = 1100/2400." 
     Type: String
     Default: "m5.2xlarge"
 
