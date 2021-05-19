@@ -2,7 +2,7 @@
 // Identify your target audience and explain how/why they would use this Quick Start.
 //Avoid borrowing text from third-party websites (copying text from AWS service documentation is fine). Also, avoid marketing-speak, focusing instead on the technical aspect.
 
-This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture in the AWS cloud.
+This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture in the AWS Cloud.
 
 The {partner-product-short-name} Quick Start is designed to help you quickly build a non-linear editing environment for your remote editorial creative teams. The remote environment consists of a Qumulo cluster and one or more editorial workstations all hosted on AWS. 
 
