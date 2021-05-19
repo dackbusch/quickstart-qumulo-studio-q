@@ -247,7 +247,7 @@ Parameters:
     Default: "10.0.0.0/16"
 
   ProvisioningServerAMI: 
-    Description: AWS Linux server Amazon Machine Image (AMI). 
+    Description: Linux server Amazon Machine Image (AMI). 
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
