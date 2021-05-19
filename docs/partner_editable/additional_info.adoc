@@ -107,7 +107,7 @@ image::../images/chrome_settings.png[Architecture]
 .Chrome default browser
 image::../images/chrome_default.png[Architecture]
 
-.Chrome make default
+.Make Chrome default
 image::../images/chrome_make.png[Architecture]
 
 .Chrome select as default browser
@@ -130,7 +130,7 @@ image::../images/qumulo_cert.png[Architecture]
 image::../images/qumulo_login.png[Architecture]
 
 [start=3]
-. The Qumulo dashboard displays either 1.3 TB or 12.6 TB usable capacity, depending on your configuration when the template is launched.
+. The Qumulo dashboard displays either 1.3 or 12.6-TB usable capacity, depending on your configuration when the template is launched.
 
 [#test16]
 .Qumulo dashboard
@@ -172,11 +172,11 @@ image::../images/qumulo_ad.png[Architecture]
 image::../images/qumulo_smb.png[Architecture]
 
 [start=9]
-. Now, all of the {partner-product-short-name} infrastructure is set up and confirmed to be properly configured. You can move content on to the Qumulo cluster using the *S3 Browser* link on the desktop or any other preferred S3 utility and simply drop the content in the Q drive. All workstations and users now have access to the Q drive. Also, if you create multiple workstations, you can log in to those workstations using the credentials created in this first Teradici session. Any user can log in to any workstation because they are authenticated with Active Directory. 20 users are created by default (for example, studioqUser1, studioqUser2,...studioqUser20). At first login, users must change their password.
+. Now, all of the {partner-product-short-name} infrastructure is set up and confirmed to be properly configured. You can move content on to the Qumulo cluster using the *S3 Browser* link on the desktop or any other preferred S3 utility and drop the content in the Q drive. All workstations and users now have access to the Q drive. Also, if you create multiple workstations, you can log in to those workstations using the credentials created in this first Teradici session. Any user can log in to any workstation because they are authenticated with Active Directory. Twenty users are created by default (for example, studioqUser1, studioqUser2,...studioqUser20). At first login, users must change their password.
 
 == Add another workstation 
 
-The initial deployment deploys 1-10 workstations. If you want to add another workstation, follow these steps:
+The initial deployment deploys 1 to 10 workstations. If you want to add another workstation, follow these steps:
 
 [start=1]
 . Launch the following template: http://qs_launch_permalink[Deploy additional {partner-product-short-name} workstation^]. You can also (https://github.com/aws-quickstart/quickstart-qumulo-studio-q/blob/main/templates/qs-studioq-add-workstation.cft.yaml[view the template^]. 
@@ -216,7 +216,7 @@ image::../images/qumulo_temp_pwd.png[Architecture]
 image::../images/qumulo_admin_login.png[Architecture]
 
 [start=3]
-. In Qumulo-UI, choose *Support > Software Upgrade* and then *Qumulo Care*. For more information about Qumulo upgrades, see https://care.qumulo.com/hc/en-us/articles/115007247168-Qumulo-Core-Upgrades-via-UI[Qumulo Core Upgrades via UI^]
+. In Qumulo-UI, choose *Support > Software Upgrade* and then *Qumulo Care*. For more information about Qumulo upgrades, see https://care.qumulo.com/hc/en-us/articles/115007247168-Qumulo-Core-Upgrades-via-UI[Qumulo Core Upgrades via UI^].
 
 .Get the latest upgrade
 image::../images/qumulo_get_upgrade.png[Architecture]
@@ -243,7 +243,7 @@ image::../images/qumulo_upgraded.png[Architecture]
 The final step in the upgrade is to update the Python code in the sidecar Lambda functions. This insures that CloudWatch metrics and EBS volume monitoring are in sync with the latest Qumulo Core software on the cluster.
 
 [start=1]
-. In the AWS Console, navigate to CloudFormation and select the original top-level stack for the deployment.  Then select *Update*.
+. In the AWS Management Console, navigate to CloudFormation and select the original top-level stack for the deployment.  Then select *Update*.
 
 .Update original stack
 image::../images/sidecar_update.png[Architecture]
