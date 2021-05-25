@@ -20,3 +20,5 @@ This Quick Start supports the following Regions:
 ** eu-west-3, Europe (Paris)
 
 //Full list: https://docs.aws.amazon.com/general/latest/gr/rande.html
+
+NOTE: When selecting a Region and Availability Zones, note that this Quick Start is not supported in local zones.
