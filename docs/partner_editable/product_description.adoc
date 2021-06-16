@@ -8,4 +8,4 @@ This Quick Start builds a Qumulo cluster and one or more editorial workstations 
 
 With Qumulo's {partner-product-short-name} solution, editors have the same editorial experience as if they are working with local resources.
 
-If you prefer larger editorial environments, contact Qumulo at mailto:studioq@qumulo.com[studioq@qumulo.com^].
+If you prefer larger editorial environments, contact Qumulo.
