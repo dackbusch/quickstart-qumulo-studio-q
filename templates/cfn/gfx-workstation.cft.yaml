@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: This template instantiates an EC2 instance with Teradici installed and a prompt to install Adobe Premier Pro via Adobe Creative Cloud
+Description: This template instantiates an EC2 instance with Teradici installed and a prompt to install Adobe Premier Pro via Adobe Creative Cloud (qs-1s0p493im)
 Metadata:
   AWSAMIRegionMap:
     Filters:
@@ -130,6 +130,11 @@ Resources:
 
   WorkstationAccessRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource #KMS policy requires wildcard
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template creates an resource group for the QSTACK for easy filtering in Cloud Watch
+Description: This template creates an resource group for the QSTACK for easy filtering in Cloud Watch (qs-1s0p493jo)
 
 Parameters:
   QStackID:

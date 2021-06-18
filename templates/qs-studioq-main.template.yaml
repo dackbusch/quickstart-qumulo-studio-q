@@ -452,6 +452,10 @@ Resources:
   QIAMSTACK:
     Type: "AWS::CloudFormation::Stack"
     Properties:
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TemplateURL:
         !Sub
           - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/qiam.cft.yaml
@@ -461,7 +465,6 @@ Resources:
 
   QSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: QIAMSTACK
     Properties:
       Parameters:
         ClusterName: !Ref QClusterName
@@ -484,7 +487,6 @@ Resources:
 
   DCSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: QSTACK
     Properties:
       Parameters:
         DirectoryServerAmi: !Ref DirectoryServerAmi
@@ -620,7 +622,6 @@ Resources:
 
   WORKSTATIONSTACK2:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision2
     Properties:
       Parameters:
@@ -636,7 +637,6 @@ Resources:
 
   WORKSTATIONSTACK3:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision3
     Properties:
       Parameters:
@@ -652,7 +652,6 @@ Resources:
 
   WORKSTATIONSTACK4:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision4
     Properties:
       Parameters:
@@ -668,7 +667,6 @@ Resources:
 
   WORKSTATIONSTACK5:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision5
     Properties:
       Parameters:
@@ -684,7 +682,6 @@ Resources:
 
   WORKSTATIONSTACK6:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision6
     Properties:
       Parameters:
@@ -700,7 +697,6 @@ Resources:
 
   WORKSTATIONSTACK7:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision7
     Properties:
       Parameters:
@@ -716,7 +712,6 @@ Resources:
 
   WORKSTATIONSTACK8:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision8
     Properties:
       Parameters:
@@ -732,7 +727,6 @@ Resources:
 
   WORKSTATIONSTACK9:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Provision9
     Properties:
       Parameters:
@@ -748,7 +742,6 @@ Resources:
 
   WORKSTATIONSTACK10:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: WORKSTATIONSTACK
     Condition: Ten
     Properties:
       Parameters:

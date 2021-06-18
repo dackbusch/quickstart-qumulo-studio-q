@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: This template creates several Security Groups for use in subsequent stacks
+Description: This template creates several Security Groups for use in subsequent stacks (qs-1s0p493k1)
 
 Parameters:
   VpcId:

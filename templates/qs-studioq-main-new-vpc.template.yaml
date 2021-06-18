@@ -416,7 +416,6 @@ Resources:
 
   StudioQStack:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: AWSVPCSTACK
     Properties:
       Parameters:
         adServiceAccountPassword: !Ref adServiceAccountPassword

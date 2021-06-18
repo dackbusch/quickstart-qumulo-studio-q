@@ -37,7 +37,7 @@
             ]
         }
     },
-    "Description": "Qumulo for AWS has the highest performance of any file storage system in the public cloud and a complete set of enterprise features, such as support for SMB, real-time visibility into the storage system, directory-based capacity quotas, and snapshots.",
+    "Description": "Qumulo for AWS has the highest performance of any file storage system in the public cloud and a complete set of enterprise features, such as support for SMB, real-time visibility into the storage system, directory-based capacity quotas, and snapshots. (qs-1s0p493eo)",
     "Mappings": {
          "RegionMap": {
                             "us-east-1": {

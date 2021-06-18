@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: This template builds the VPC, public and private subnets, NAT gateway, and several Security Groups
+Description: This template builds the VPC, public and private subnets, NAT gateway, and several Security Groups (qs-1s0p493i2)
 
 Parameters:
   VpcCidr:
