@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template instantiates an EC2 instance for configuration of the Qumulo Cluster and is then shutdown.  Floating IPs, Sidecar role and permissions, SMB share, AD Config, EBS Volume Tagging, and CMK Policy management are all configured. (qs-1s0p493j3)
+Description: This template instantiates an EC2 instance for configuration of the Qumulo Cluster and is then shutdown.  Floating IPs, Sidecar role and permissions, SMB share, AD Config, EBS Volume Tagging, and CMK Policy management are all configured.
 
 Parameters:
   ProvisioningServerAMI:
@@ -158,14 +158,18 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "kms:*"
-                  - "ec2:*"
+                  - "ec2:DeleteTags"
+                  - "ec2:CreateTags"
+                  - "ec2:DescribeVolumes"
                   - "iam:GenerateCredentialReport"
-                  - "iam:GenerateServiceLastAccessedDetails"
-                  - "iam:Get*"
                   - "iam:List*"
-                  - "iam:SimulateCustomPolicy"
+                  - "iam:Get*"
+                  - "iam:GenerateServiceLastAccessedDetails"
                   - "iam:SimulatePrincipalPolicy"
+                  - "iam:SimulateCustomPolicy"
+                  - "kms:Decrypt"
+                  - "kms:PutKeyPolicy"
+                  - "kms:GetKeyPolicy"
                 Resource: "*"
 
   ProvisionerProfile:
