@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template creates an IAM Profile for subsequent use by the QSTACK template during cluster creation
+Description: This template creates an IAM Profile for subsequent use by the QSTACK template during cluster creation (qs-1s0p493jb)
 
 Resources:
   QumuloAccessRole:
