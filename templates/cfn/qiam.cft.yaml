@@ -4,6 +4,11 @@ Description: This template creates an IAM Profile for subsequent use by the QSTA
 Resources:
   QumuloAccessRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource #Policy has been crafted based on least privilege principle
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
