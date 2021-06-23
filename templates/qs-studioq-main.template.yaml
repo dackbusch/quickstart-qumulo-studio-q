@@ -260,7 +260,7 @@ Parameters:
   SideCarTemplate:
     Description: Do not change unless a newer version of Qumulo is being used.
     Type: String
-    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/3.3.0/sidecar_cft.json"
+    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/4.0.6/sidecar_cft.json"
 
   SideCarUsername:
     Type: String
