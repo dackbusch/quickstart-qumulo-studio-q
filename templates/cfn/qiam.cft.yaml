@@ -8,7 +8,11 @@ Resources:
       cfn-lint:
         config:
           ignore_checks:
-            - EIAMPolicyWildcardResource #Policy has been crafted based on least privilege principle
+            - EIAMPolicyWildcardResource
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Policy has been crafted based on least privilege principle"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

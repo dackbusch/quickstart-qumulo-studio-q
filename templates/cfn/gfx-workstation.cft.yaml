@@ -134,7 +134,11 @@ Resources:
       cfn-lint:
         config:
           ignore_checks:
-            - EIAMPolicyWildcardResource #KMS policy requires wildcard
+            - EIAMPolicyWildcardResource
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "KMS policy requires wildcard"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

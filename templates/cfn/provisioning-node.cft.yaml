@@ -126,6 +126,15 @@ Resources:
 
   ProvisionerRole:
     Type: 'AWS::IAM::Role'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Policy has been crafted based on least privilege principle"
+          - id: W40
+            reason: "Standard Amazon practice"
+          - id: W5
+            reason: "Standard Amazon practice"
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
