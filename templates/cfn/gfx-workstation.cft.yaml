@@ -60,35 +60,49 @@ Conditions:
 Mappings:
   AWSAMIRegionMap:
     us-east-1:
-      TERADICIWIN: ami-0299806a7a0db74d5
+      TERADICIWIN: ami-03e5c2b6b8649b63f
     us-east-2:
-      TERADICIWIN: ami-0f095edee697b1ef3
+      TERADICIWIN: ami-0aa95af6f33ef4028
     us-west-1:
-      TERADICIWIN: ami-08281d8103b7f233f
+      TERADICIWIN: ami-083b55f84f495751b
     us-west-2:
-      TERADICIWIN: ami-0f7adbd07e91f6e83 
-    ap-south-1:
-      TERADICIWIN: ami-0702d91f70d599eed
-    ap-northeast-1:
-      TERADICIWIN: ami-03ecf29831389b4b9
-    ap-northeast-2:
-      TERADICIWIN: ami-07b7cbeb34f3aec62
-    ap-southeast-1:
-      TERADICIWIN: ami-0c31c675576e68ef7
-    ap-southeast-2:
-      TERADICIWIN: ami-0d08f56894d871c29
+      TERADICIWIN: ami-0bd4d5ba065ed3cd5
+    us-gov-west-1:
+      TERADICIWIN: ami-09200b4bf77b723cd
+    us-gov-east-1:
+      TERADICIWIN: ami-0b77d9d273cd3f149
     ca-central-1:
-      TERADICIWIN: ami-0904994a77fe6564f
+      TERADICIWIN: ami-04f7bf99fe5281be2
     eu-central-1:
-      TERADICIWIN: ami-04ebd347ba3b42e14
+      TERADICIWIN: ami-02562d034cdc0feaf
     eu-west-1:
-      TERADICIWIN: ami-06f1c5023ce0f9d81
+      TERADICIWIN: ami-0eae3fbb9e3560a65
     eu-west-2:
-      TERADICIWIN: ami-08f26e8c09e56cd6e
+      TERADICIWIN: ami-0b8e91503fc3c224a
     eu-west-3:
-      TERADICIWIN: ami-0cca22c15cd254f37
+      TERADICIWIN: ami-0446e9d63c6c1a7b0
+    eu-north-1:
+      TERADICIWIN: ami-07a118936af551076
+    eu-south-1:
+      TERADICIWIN: ami-0eba84a66612523da
+    ap-southeast-1:
+      TERADICIWIN: ami-04693ac630ab11aea
+    ap-southeast-2:
+      TERADICIWIN: ami-056704a526e11b3aa
+    ap-south-1:
+      TERADICIWIN: ami-03775637c9cc8a248
+    ap-northeast-1:
+      TERADICIWIN: ami-01f2388db2b94352f
+    ap-northeast-2:
+      TERADICIWIN: ami-0b92f3e1f66a54c46
+    ap-east-1:
+      TERADICIWIN: ami-0222efe52c0cdd1f4
     sa-east-1:
-      TERADICIWIN: ami-07819057af66de0b6
+      TERADICIWIN: ami-0b1f25b0e02a13b30
+    me-south-1:
+      TERADICIWIN: ami-09dcb073fa7ce6ce3
+    af-south-1:
+      TERADICIWIN: ami-001e706b63010bd51
 
 Resources:
 
@@ -157,12 +171,13 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
-                Resource: !Join
-                  - ""
-                  - - "arn:aws:s3:::"
-                    - !Ref BucketName
-                    - "*"
+                  - "s3:Get*"
+                  - "s3:List*"
+                Resource:
+                  - !Sub "arn:aws:s3:::${BucketName}"
+                  - !Sub "arn:aws:s3:::${BucketName}/*"     
+                  - "arn:aws:s3:::ec2-windows-nvidia-drivers"
+                  - "arn:aws:s3:::ec2-windows-nvidia-drivers/*"                                 
         - PolicyName: WorkstationSecretsAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -237,6 +252,9 @@ Resources:
             "C:\\cfn\\install\\workstationsetup.ps1":
               authentication: rolebased
               source: !Join ["", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
+            "C:\\cfn\\install\\install-gpu-drivers.ps1":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/install-gpu-drivers.ps1"]]
             "C:\\cfn\\install\\set-wallpaper.ps1":
               authentication: rolebased
               source: !Join ["", [!Ref RootURL, "cfn-init/set-wallpaper.ps1"]]    
