@@ -263,6 +263,7 @@ net user Administrator $admin_password /active:yes
 
 #PCoIP-Agent-Register
 
+#Now join the domain
 Join-Domain
 
 "Adding domain users to remote desktop users"
@@ -290,6 +291,16 @@ $Installer = "s3browser-9-5-5.exe"
 Invoke-WebRequest "https://netsdk.s3.amazonaws.com/s3browser/9.5.5/s3browser-9-5-5.exe" -OutFile $Path\$Installer
 Start-Process -FilePath $Path\$Installer -Args "/VERYSILENT /install /NORESTART" -Verb RunAs -Wait
 Remove-Item $Path\$Installer
+
+$Path = $env:TEMP
+$Installer = "7z1900-x64.msi"
+Invoke-WebRequest "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile $Path\$Installer
+Start-Process msiexec.exe -Wait -ArgumentList "/I $Path\$Installer /quiet" -Verb RunAs
+Remove-Item $Path\$Installer
+
+#Install Latest Nvidia Drivers
+$PSScriptRoot
+& $PSScriptRoot\install-gpu-drivers.ps1
 
 # Enable Audio Service
 Set-Service -Name Audiosrv -StartupType Automatic -Status Running
