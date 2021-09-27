@@ -120,11 +120,6 @@ Resources:
 
   default:
     Type: "AWS::EC2::SecurityGroup"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F1000
-            reason: "Standard Amazon practice"
     Properties:
       GroupDescription: default
       VpcId: !Ref VPC

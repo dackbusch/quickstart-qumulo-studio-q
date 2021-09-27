@@ -13,15 +13,6 @@ Resources:
  
   AllowInternalSG:
     Type: "AWS::EC2::SecurityGroup"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F1000
-            reason: "Standard Amazon practice"
-          - id: W36
-            reason: "Group description is sufficient"
-          - id: W42
-            reason: "Standard Amazon practice"
     Properties:
       GroupDescription: "Allow VPC Internal"
       SecurityGroupIngress:
@@ -33,13 +24,6 @@ Resources:
 
   AllowRdpSG:
     Type: "AWS::EC2::SecurityGroup"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F1000
-            reason: "Standard Amazon practice"
-          - id: W36
-            reason: "Group description is sufficient"
     Properties:
       GroupDescription: Allow Teradici PCoIP
       SecurityGroupIngress:
@@ -63,13 +47,6 @@ Resources:
 
   AllowQumuloSG:
     Type: "AWS::EC2::SecurityGroup"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F1000
-            reason: "Standard Amazon practice"
-          - id: W36
-            reason: "Group description is sufficient"
     Properties:
       GroupDescription: Allow Qumulo
       SecurityGroupIngress:
