@@ -39,71 +39,74 @@
     },
     "Description": "Qumulo for AWS has the highest performance of any file storage system in the public cloud and a complete set of enterprise features, such as support for SMB, real-time visibility into the storage system, directory-based capacity quotas, and snapshots. (qs-1s0p493eo)",
     "Mappings": {
-         "RegionMap": {
-                            "us-east-1": {
-                                "AMI": "ami-0ac1d95c5df4dec2d"
-                            },
-                            "us-east-2": {
-                                "AMI": "ami-0ce9d852bc5637f12"
-                            },
-                            "us-west-1": {
-                                "AMI": "ami-0cbfc7342b09ab8c5"
-                            },
-                            "us-west-2": {
-                                "AMI": "ami-02c9d583f4679ca63"
-                            },
-                            "us-gov-west-1": {
-                                "AMI": "ami-0e3f94e48aed998c7"
-                            },
-                            "us-gov-east-1": {
-                                "AMI": "ami-0123c26a0427f7afb"
-                            },
-                            "ca-central-1": {
-                                "AMI": "ami-0bbf5e48b0718efb4"
-                            },
-                            "eu-central-1": {
-                                "AMI": "ami-05aa673b1b45963d7"
-                            },
-                            "eu-west-1": {
-                                "AMI": "ami-0229948b65d602d26"
-                            },
-                            "eu-west-2": {
-                                "AMI": "ami-05c397d51b796227d"
-                            },
-                            "eu-west-3": {
-                                "AMI": "ami-0b5f1f44ddab0981a"
-                            },
-                            "eu-north-1": {
-                                "AMI": "ami-0a98564d03b22e0e9"
-                            },
-                            "eu-south-1": {
-                                "AMI": "ami-0bc09301a652fe5ba"
-                            },
-                            "ap-southeast-1": {
-                                "AMI": "ami-021b6082f56d08808"
-                            },
-                            "ap-southeast-2": {
-                                "AMI": "ami-09c177b6e8f6f1f14"
-                            },
-                            "ap-south-1": {
-                                "AMI": "ami-030612690d86e9caf"
-                            },
-                            "ap-northeast-1": {
-                                "AMI": "ami-0eb090ae3243b90e8"
-                            },
-                            "ap-northeast-2": {
-                                "AMI": "ami-021f2cb33257de6ec"
-                            },
-                            "ap-east-1": {
-                                "AMI": "ami-0e9240c9ab6b4da87"
-                            },
-                            "sa-east-1": {
-                                "AMI": "ami-0fbc365849823c05e"
-                            },
-                            "me-south-1": {
-                                "AMI": "ami-0aa6a740c39d9506c"
-                            }
-                        }
+        "RegionMap": {
+            "ca-central-1": {
+                "AMI": "ami-07db1f322a0dd38bf"
+            }, 
+            "eu-central-1": {
+                "AMI": "ami-0f2e1a56f47205fad"
+            }, 
+            "eu-west-1": {
+                "AMI": "ami-06501a7623841054a"
+            }, 
+            "eu-west-2": {
+                "AMI": "ami-07693f0b7017f1465"
+            }, 
+            "eu-west-3": {
+                "AMI": "ami-0c10ff31c3d56bfd1"
+            }, 
+            "us-east-1": {
+                "AMI": "ami-077acd602798fc77e"
+            }, 
+            "us-east-2": {
+                "AMI": "ami-0099d82b5478ac3a8"
+            }, 
+            "us-west-1": {
+                "AMI": "ami-092cfa109507c9b60"
+            }, 
+            "us-west-2": {
+                "AMI": "ami-01e02781c4077b271"
+            }, 
+            "ap-southeast-1": {
+                "AMI": "ami-05de76f47706a8f4e"
+            }, 
+            "ap-southeast-2": {
+                "AMI": "ami-0f20efcaa00ee2738"
+            }, 
+            "ap-south-1": {
+                "AMI": "ami-0abb3978e9a20cdc6"
+            }, 
+            "ap-northeast-1": {
+                "AMI": "ami-09f49f11ea0372500"
+            }, 
+            "ap-northeast-2": {
+                "AMI": "ami-075caac55b16264cb"
+            }, 
+            "sa-east-1": {
+                "AMI": "ami-094d1566d65c3780b"
+            }, 
+            "eu-north-1": {
+                "AMI": "ami-07da0faea766285ab"
+            }, 
+            "ap-east-1": {
+                "AMI": "ami-0f95089db128afbbd"
+            }, 
+            "me-south-1": {
+                "AMI": "ami-0d3e0b1cf30993bf4"
+            }, 
+            "af-south-1": {
+                "AMI": "ami-05a7fe2f132a352f7"
+            }, 
+            "eu-south-1": {
+                "AMI": "ami-0a8a113680aea86bb"
+            }, 
+            "us-gov-east-1": {
+                "AMI": "ami-005efb68076cfca72"
+            }, 
+            "us-gov-west-1": {
+                "AMI": "ami-0b15b99c977ebae7e"
+            }
+        }
     },
     "Metadata": {
         "AWS::CloudFormation::Interface": {

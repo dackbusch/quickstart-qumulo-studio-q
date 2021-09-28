@@ -34,7 +34,7 @@ image::../images/image3.png[Architecture]
 image::../images/image4.png[Architecture,width=25%,height=25%]
 
 [start=6]
-. Check to see if the Teradici client recognizes the Active Directory domain name entered in the template.  Workstations take about 10 minutes to boot and configure about completing the template. If the domain name is not found, close the Teradici window and repeat steps 3 and 4.
+. Check to see if the Teradici client recognizes the Active Directory domain name entered in the template.  Workstations take about 10 minutes to boot and configure after the template completes. If the domain name is not found, close the Teradici window and repeat steps 3 and 4.
 
 [#test5]
 .Teradici login with valid Active Directory domain
@@ -69,7 +69,7 @@ image::../images/image8.png[Architecture]
 image::../images/desktop.png[Architecture]
 
 [start=11]
-. Open File Explorer and verify that the Q drive has been mapped.
+. Open File Explorer and verify that the Q drive has been mapped.  Notice the local NVME drive has been initialized and formatted as well.  When configuring Adobe Premiere Pro set the cache to use the local NVME drive.
 
 [#test10]
 .Q: Drive mapped to Qumulo
@@ -123,7 +123,7 @@ image::../images/chrome_select.png[Architecture]
 image::../images/qumulo_cert.png[Architecture]
 
 [start=2]
-. Enter your Active Directory base account name and the default password. The user name for this login is not appended with a number. Note that this is not an Active Directory login, but a user that has been created with the same Active Directory default credentials and given read-only privileges to view all settings and activity on the cluster. 
+. Enter your Active Directory *domain-name\user-name* and your *password*. You will be authenticated with your Active Directory credentials and given read-only privileges to view all settings and activity on the cluster. 
 
 [#test15]
 .Qumulo UI login
@@ -216,7 +216,7 @@ image::../images/qumulo_temp_pwd.png[Architecture]
 image::../images/qumulo_admin_login.png[Architecture]
 
 [start=3]
-. In Qumulo-UI, choose *Support > Software Upgrade* and then *Qumulo Care*. For more information about Qumulo upgrades, see https://care.qumulo.com/hc/en-us/articles/115007247168-Qumulo-Core-Upgrades-via-UI[Qumulo Core Upgrades via UI^].
+. In the Qumulo-UI, choose *Support > Software Upgrade* and then *latest upgrade file*. For more information about Qumulo upgrades, see https://care.qumulo.com/hc/en-us/articles/115007247168-Qumulo-Core-Upgrades-via-UI[Qumulo Core Upgrades via UI^].
 
 .Get the latest upgrade
 image::../images/qumulo_get_upgrade.png[Architecture]
@@ -234,7 +234,7 @@ image::../images/upgrade_file.png[Architecture]
 image::../images/qumulo_upgrade_path.png[Architecture]
 
 [start=6]
-. When the upgrade is completed, log back in to the Qumulo cluster and confirm that the new version is installed.
+. When the upgrade is completed, confirm that the new version is installed.
 
 .Qumulo upgraded
 image::../images/qumulo_upgraded.png[Architecture]

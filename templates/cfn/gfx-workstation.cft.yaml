@@ -148,11 +148,7 @@ Resources:
       cfn-lint:
         config:
           ignore_checks:
-            - EIAMPolicyWildcardResource
-      cfn_nag:
-        rules_to_suppress:
-          - id: W11
-            reason: "KMS policy requires wildcard"
+            - EIAMPolicyWildcardResource #KMS policy requires wildcard
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -249,6 +245,9 @@ Resources:
                 FloatDNSName: !Ref FloatDNSName
                 SMBShareName: !Ref SMBShareName
               source: !Join ["", [!Ref RootURL, "cfn-init/workstation.conf"]]
+            "C:\\cfn\\install\\workstationrename.ps1":
+              authentication: rolebased
+              source: !Join ["", [!Ref RootURL, "cfn-init/workstationrename.ps1"]]
             "C:\\cfn\\install\\workstationsetup.ps1":
               authentication: rolebased
               source: !Join ["", [!Ref RootURL, "cfn-init/workstationsetup.ps1"]]
@@ -277,31 +276,34 @@ Resources:
                   - "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
         "2-run":
           commands:
-            "01-setup-workstation":
+            "01-rename-workstation":
+              command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\workstationrename.ps1"
+              waitAfterCompletion: "forever"            
+            "02-setup-workstation":
               command: "powershell.exe -ExecutionPolicy Unrestricted -File C:\\cfn\\install\\workstationsetup.ps1 -WorkstationConf c:\\cfn\\install\\workstation.conf"
               waitAfterCompletion: "forever"
-            "02-configure-task-set-wallpaper":
+            "03-configure-task-set-wallpaper":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Set Wallpaper\" /ru \""
                   - !Ref domainName
                   - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File C:\\cfn\\install\\set-wallpaper.ps1\""
               waitAfterCompletion: 0
-            "03-configure-task-map-drive":
+            "04-configure-task-map-drive":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Map Q Drive\" /ru \""
                   - !Ref domainName
                   - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File c:\\mapdrive.ps1\""
               waitAfterCompletion: 0
-            "04-configure-task-launch-adobe":
+            "05-configure-task-launch-adobe":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Launch Adobe Webpage\" /ru \""
                   - !Ref domainName
                   - "\\Domain Users\" /sc ONLOGON /tr \"powershell.exe -WindowStyle Hidden -File c:\\cfn\\install\\launch-adobe.ps1\""
               waitAfterCompletion: 0
-            "05-configure-task-disable-defender":
+            "06-configure-task-disable-defender":
               command: !Join 
                 - ""
                 - - "schtasks /create /tn \"Disable Defender\" /ru \""

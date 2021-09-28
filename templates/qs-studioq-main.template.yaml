@@ -260,7 +260,7 @@ Parameters:
   SideCarTemplate:
     Description: Do not change unless a newer version of Qumulo is being used.
     Type: String
-    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/4.0.6/sidecar_cft.json"
+    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/4.2.0/sidecar_cft.json"
 
   SideCarUsername:
     Type: String
@@ -452,10 +452,6 @@ Resources:
   QIAMSTACK:
     Type: "AWS::CloudFormation::Stack"
     Properties:
-#      Parameters:
-#        QSS3BucketName: !Ref QSS3BucketName
-#        QSS3BucketRegion: !Ref QSS3BucketRegion
-#        QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TemplateURL:
         !Sub
           - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/qiam.cft.yaml
@@ -520,7 +516,6 @@ Resources:
 
   QSIDECARSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: DCSTACK
     Properties:
       Parameters:
         SecurityGroup: !GetAtt SECURITYSTACK.Outputs.AllowQumuloSGId
@@ -554,7 +549,7 @@ Resources:
         DomainControllerSecretsArn: !GetAtt SECRETSSTACK.Outputs.DomainControllerSecretsArn
         SideCarSecretsArn: !GetAtt SECRETSSTACK.Outputs.SideCarSecretsArn
         CMK: !Ref VolumesEncryptionKey
-        StackName: !Select [0, !Split ["-", !Ref "AWS::StackName"]]
+        StackName: !Ref "AWS::StackName"
         QStackName: !GetAtt QSTACK.Outputs.AWSStackName
         BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]  
         CMKPolicyPath:
@@ -570,25 +565,27 @@ Resources:
 
   CLOUDWATCHSTACK:
     Type: 'AWS::CloudFormation::Stack'
-    DependsOn: PROVISIONINGSTACK
     Properties:
       Parameters:
+        QClusterName: !Ref QClusterName 
         QStackID: !GetAtt QSTACK.Outputs.AWSStackID
         QStackName: !GetAtt QSTACK.Outputs.AWSStackName
         TopStackName: !Ref AWS::StackName
+        QAuditLog: "NO"
+        Region: !Ref AWS::Region             
         AllFlash: !If
           - 4x5TBHybrid
           - "Hybrid"
           - "AF"
       TemplateURL:
         !Sub
-          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/resource-group.cft.yaml
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/cloud-watch.cft.yaml
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       
   WORKSTATIONSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: PROVISIONINGSTACK
+    DependsOn: DCSTACK
     Properties:
       Parameters:
         FirstStation: "TRUE"

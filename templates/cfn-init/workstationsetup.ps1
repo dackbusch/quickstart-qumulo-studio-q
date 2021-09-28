@@ -159,9 +159,7 @@ function Join-Domain {
   $cred = New-Object System.Management.Automation.PSCredential ($username,$password)
 
   # Read "Name" tag for hostname
-  $instance_id = Get-EC2InstanceMetadata -Category "InstanceId"
-  $hname = hostname
-  $host_name = $hname + "-" + $instance_id
+  $host_name = hostname
 
   # Looping in case Domain Controller is not yet available
   $Interval = 10
@@ -172,7 +170,8 @@ function Join-Domain {
     try {
       $Retry = $false
       # Don't do -Restart here because there is no log showing the restart
-      Add-Computer -DomainName $domainname -Credential $cred -Verbose -Force -ErrorAction Stop
+      # Add-Computer -ComputerName $host_name -NewName $instance_id -DomainName $domainname -Credential $cred -Verbose -Force -ErrorAction Stop
+      Add-Computer -ComputerName $host_name -DomainName $domainname -Credential $cred -Verbose -Force -ErrorAction Stop      
     }
 
     # The same Error, System.InvalidOperationException, is thrown in these cases:
@@ -183,10 +182,10 @@ function Join-Domain {
       $PSItem
 
       # Sometimes domain join is successful but renaming the computer fails
-      if ($PSItem.FullyQualifiedErrorId -match "FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand") {
-        Retry -Action { Rename-Computer -NewName "$host_name" -DomainCredential $cred }
-        break
-      }
+      # if ($PSItem.FullyQualifiedErrorId -match "FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand") {
+      #  Retry -Action { Rename-Computer -NewName "$instance_id" -DomainCredential $cred }
+      #  break
+      # }
 
       if ($PSItem.FullyQualifiedErrorId -match "AddComputerToSameDomain,Microsoft.PowerShell.Commands.AddComputerCommand") {
         "WARNING: Computer already joined to domain."
@@ -242,9 +241,6 @@ if (Test-Path $LOG_FILE) {
 
 Start-Transcript -Path $LOG_FILE -Append -IncludeInvocationHeader
 
-"let Cluster calm down, sleeping 2 minutes"
-Start-Sleep -s 120
-
 "Script running as user '$(whoami)'"
 
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -259,10 +255,6 @@ net user Administrator $admin_password /active:yes
 
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-#PCoIP-Agent-Install
-
-#PCoIP-Agent-Register
-
 #Now join the domain
 Join-Domain
 
@@ -270,14 +262,18 @@ Join-Domain
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Domain Users"
 Add-LocalGroupmember -Group "Administrators" -Member "Domain Users"
 
-# Install Chrome
+#PCoIP-Agent-Install
+
+#PCoIP-Agent-Register
+
+"Install Chrome"
 $Path = $env:TEMP
 $Installer = "chrome_installer.exe"
 Invoke-WebRequest "http://dl.google.com/chrome/chrome_installer.exe" -OutFile $Path\$Installer
 Start-Process -FilePath $Path\$Installer -Args "/silent /install" -Verb RunAs -Wait
 Remove-Item $Path\$Installer
 
-# Disable IE ESC
+"Disable IE ESC"
 $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
 $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
 Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0 -Force
@@ -286,12 +282,14 @@ Rundll32 iesetup.dll, IEHardenLMSettings,1,True
 Rundll32 iesetup.dll, IEHardenUser,1,True
 Rundll32 iesetup.dll, IEHardenAdmin,1,True
 
+"Install S3 Browser"
 $Path = $env:TEMP
 $Installer = "s3browser-9-5-5.exe"
 Invoke-WebRequest "https://netsdk.s3.amazonaws.com/s3browser/9.5.5/s3browser-9-5-5.exe" -OutFile $Path\$Installer
 Start-Process -FilePath $Path\$Installer -Args "/VERYSILENT /install /NORESTART" -Verb RunAs -Wait
 Remove-Item $Path\$Installer
 
+"Install 7-Zip"
 $Path = $env:TEMP
 $Installer = "7z1900-x64.msi"
 Invoke-WebRequest "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile $Path\$Installer
@@ -302,10 +300,10 @@ Remove-Item $Path\$Installer
 $PSScriptRoot
 & $PSScriptRoot\install-gpu-drivers.ps1
 
-# Enable Audio Service
+"Enable Audio Service"
 Set-Service -Name Audiosrv -StartupType Automatic -Status Running
 
-# Add Link to Qumulo UI
+"Add Link to Qumulo UI"
 $WshShell = New-Object -comObject WScript.Shell
 $path = "C:\Users\Public\Desktop\Qumulo-UI.url"
 $targetpath = "https://" + $FloatDNSName + "." + $domainname
@@ -318,7 +316,7 @@ Add-Content $path "HotKey=0"
 Add-Content $path "$iconfile"
 Add-Content $path "IconIndex=0"
 
-# Add Link to Qumulo KB
+"Add Link to Qumulo KB"
 $WshShell2 = New-Object -comObject WScript.Shell
 $path2 = "C:\Users\Public\Desktop\Qumulo-KB.url"
 $targetpath2 = "https://care.qumulo.com"
@@ -331,7 +329,7 @@ Add-Content $path2 "HotKey=0"
 Add-Content $path2 "$iconfile2"
 Add-Content $path2 "IconIndex=0"
 
-# Add Link for SMB Share on Qumulo
+"Add Link for SMB Share on Qumulo"
 $WshShell3 = New-Object -comObject WScript.Shell
 $path3 = "C:\Users\Public\Desktop\adobe-projects.url"
 $targetpath3 = "\\" + $FloatDNSName + "\" + $SMBShareName
@@ -344,9 +342,15 @@ Add-Content $path3 "HotKey=0"
 Add-Content $path3 "$iconfile3"
 Add-Content $path3 "IconIndex=0"
 
-# Delete Extraneous Shortcuts
+"Delete Extraneous Shortcuts"
 Remove-Item "C:\Users\Public\Desktop\Teradici Website.url"
+
+"Initialize, partition, and format the local NVME drive"
+
+$disk = Get-Disk | where-object PartitionStyle -eq "RAW"  
+Initialize-Disk -Number $disk.Number -PartitionStyle MBR -confirm:$false  
+New-Partition -DiskNumber $disk.Number -UseMaximumSize -IsActive | Format-Volume -FileSystem NTFS -NewFileSystemLabel "NVME Disk" -confirm:$False  
+Set-Partition -DiskNumber $disk.Number -PartitionNumber 1 -NewDriveLetter D  
 
 "Restarting Workstation"
 Restart-Computer -Force
-
