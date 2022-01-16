@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template instantiates a Windows Domain Controller in the private subnet and configures active directory and DNS (qs-1s0p493ia)
+Description: This template instantiates a Windows Domain Controller in the private subnet and configures active directory and DNS
 
 Parameters:
   RootURL:

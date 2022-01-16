@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: This is the main template for the Qumulo Studio Q on AWS Quick Start. It spins up Qumulo, Adobe, and Teradici for a remote editorial environment. It calls subordinate CloudFormation templates to instantiate the infrastructure. (qs-1rkounelh)
+Description: This is the main template for the StudioQ AWS Quick Start.  It spins up Qumulo+Adobe+Teradici for a remote editorial environment.  It calls subordinate CloudFormation templates to instantiate the infrastructure. (qs-1rkounelh)
 
 Metadata:
   QuickStartDocumentation:
-    EntrypointName: "Parameters for launching into an existing VPC"
+    EntrypointName: "Launch into an existing VPC"
     Order: "2"
   AWS::CloudFormation::Interface:
     ParameterGroups:
 
       - Label: 
-          default: AWS network configuration
+          default: AWS Network Configuration
         Parameters:
           - VpcId
           - VpcCidr
@@ -18,7 +18,7 @@ Metadata:
           - PrivateSubnetId
 
       - Label:
-          default: Qumulo file data platform configuration
+          default: Qumulo File Data Platform Configuration
         Parameters:
           - QCapacityType
           - QInstanceType
@@ -30,7 +30,7 @@ Metadata:
           - QInstanceRecoveryTopic
 
       - Label:
-          default: Qumulo CloudWatch metrics and monitoring configuration
+          default: Qumulo CloudWatch Metrics & Monitoring Configuration
         Parameters:
           - SideCarUsername
           - SideCarPassword
@@ -38,14 +38,14 @@ Metadata:
           - SideCarSNSTopic
 
       - Label:
-          default: Adobe workstation configuration
+          default: Adobe Workstation Configuration
         Parameters:
           - windowsGrxInstanceType
           - numberOfWorkstations
           - publicRemoteCidr
 
       - Label:
-          default: Domain controller (Active Directory and DNS) configuration
+          default: Domain Controller (Active Directory & DNS) Configuration
         Parameters:
           - adServiceAccountUsername
           - adServiceAccountPassword
@@ -59,7 +59,7 @@ Metadata:
           - qumuloFloatRecordName
 
       - Label:
-          default: AWS Quick Start configuration
+          default: AWS Quick Start Configuration
         Parameters:
           - KeyPair
           - QSS3BucketName
@@ -74,7 +74,7 @@ Metadata:
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
       KeyPair:
-        default: "AWS key pair name"
+        default: "AWS Key-Pair Name"
       VpcId:
         default: "AWS VPC ID"
       PublicSubnetId:
@@ -82,57 +82,57 @@ Metadata:
       PrivateSubnetId:
         default: "Private subnet ID"
       VpcCidr:
-        default: "AWS VPC subnet"
+        default: "AWS VPC Subnet"
       QClusterName:
-        default: "Qumulo cluster name"
+        default: "Qumulo Cluster Name"
       QInstanceType:
-        default: "Qumulo EC2 instance type"
+        default: "Qumulo EC2 Instance Type"
       QCapacityType:
-        default: "Qumulo usable capacity and media type"
+        default: "Qumulo Usable Capacity and Media Type"
       VolumesEncryptionKey:
-        default: "(Optional) Amazon EBS volumes encryption key "
+        default: "OPTIONAL: AWS EBS Volumes Encryption Key "
       QInstanceRecoveryTopic:
-        default: "(Optional) Qumulo instance recovery topic"
+        default: "OPTIONAL: Qumulo Instance Recovery Topic"
       QSgCidr:
-        default: "Qumulo security group "
+        default: "Qumulo Security Group "
       ProvisioningServerAMI:
-        default: "Linux server for secondary configuration of Qumulo "
+        default: "Linux Server for Secondary Configuration of Qumulo "
       SMBShareName:
-        default: "SMB share name "
+        default: "SMB Share Name "
       SideCarTemplate:
-        default: "Qumulo sidecar template URL "
+        default: "Qumulo Sidecar Template URL "
       SideCarUsername:
-        default: "Qumulo sidecar user name "
+        default: "Qumulo Sidecar Username "
       SideCarPassword:
-        default: "Qumulo sidecar password "
+        default: "Qumulo Sidecar Password "
       SideCarSNSTopic:
-        default: "(Optional) Qumulo sidecar SNS topic "
+        default: "OPTIONAL: Qumulo Sidecar SNS Topic "
       windowsGrxInstanceType:
-        default: "AWS Teradici instance type "
+        default: "AWS Teradici Instance Type "
       publicRemoteCidr:
-        default: "(Optional) Remote public IP CIDR"
+        default: "OPTIONAL: Remote Public IP CIDR"
       numberOfWorkstations:
-        default: "(Optional) Total number of Adobe workstations"
+        default: "OPTIONAL: Total Number of Adobe Workstations"
       DirectoryServerAmi:
-        default: "AWS directory server AMI "
+        default: "AWS Directory Server AMI "
       domainName: 
-        default: "Domain name "
+        default: "Domain Name "
       adServiceAccountUsername:
-        default: "Active Directory service administrator user name "
+        default: "Active Directory Service Admin Username "
       adServiceAccountPassword:
-        default: "Active Directory service administrator password "
+        default: "Active Directory Service Admin Password "
       dcAdminUsername:
-        default: "Domain controller administrator user name "
+        default: "Domain Controller Admin Username "
       dcAdminPassword:
-        default: "Domain controller administrator password "
+        default: "Domain Controller Admin Password "
       safeModeAdminPassword:
-        default: "Domain controller safe-mode administrator password "
+        default: "Domain Controller Safe-Mode Admin Password "
       testusername:
-        default: "Active Directory accounts: base user name "
+        default: "Active Directory Accounts: Base Username "
       testuserpassword: 
-        default: "Active Directory accounts: default password "
+        default: "Active Directory Accounts: Default Password "
       qumuloFloatRecordName:
-        default: "DNS record name for Qumulo Round Robin DNS "
+        default: "DNS Record Name for Qumulo RR DNS "
 
 Parameters:
 
@@ -155,31 +155,30 @@ Parameters:
   QSS3BucketRegion:
     Default: 'us-east-1'
     Description: 'AWS Region where the Quick Start S3 bucket (QSS3BucketName) is 
-    hosted. Keep the default Region unless you are customizing the template. 
-    Changing this Region updates code references to point to a new Quick Start location. 
-    When using your own bucket, specify the Region. 
-    See https://aws-quickstart.github.io/option1.html.'
+      hosted. Keep the default Region unless you are customizing the template. 
+      Changing this Region updates code references to point to a new Quick Start location. 
+      When using your own bucket, specify the Region. 
+      See https://aws-quickstart.github.io/option1.html.'
     Type: String
     
   QSS3KeyPrefix:
     AllowedPattern: '^[0-9a-zA-Z-/]*$'
     ConstraintDescription:
       The Quick Start S3 key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slashes (/). The prefix should
-      end with a forward slash (/).
+      uppercase letters, hyphens (-), and forward slashes (/).
     Default: quickstart-qumulo-studio-q/
     Description:
       S3 key prefix that is used to simulate a directory for your copy of the 
       Quick Start assets. Keep the default prefix unless you are customizing 
       the template. Changing this prefix updates code references to point to 
       a new Quick Start location. This prefix can include numbers, lowercase 
-      letters, uppercase letters, hyphens (-), and forward slashes (/). End with 
-      a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html 
+      letters, uppercase letters, hyphens (-), and forward slashes (/). 
+      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html 
       and https://aws-quickstart.github.io/option1.html.
     Type: String
   
   KeyPair:
-    Description: Name of an existing EC2 key pair to enable authentication to instances.
+    Description: Name of an existing EC2 Key Pair to enable authentication to instances
     Type: AWS::EC2::KeyPair::KeyName
     Default: keypairname
 
@@ -188,7 +187,7 @@ Parameters:
     Type: AWS::EC2::VPC::Id
 
   PublicSubnetId:
-    Description: ID of the public subnet.
+    Description: ID of the private subnet.
     Type: AWS::EC2::Subnet::Id
 
   PrivateSubnetId:
@@ -203,7 +202,7 @@ Parameters:
 
   QClusterName:
     AllowedPattern: "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$"
-    Description: Name must be an alphanumeric string between 2 and 15 characters. Dash (-) is allowed if not the first or last character.
+    Description: Name must be an alpha-numeric string between 2 and 15 characters. Dash (-) is allowed if not the first or last character.
     MaxLength: 15
     MinLength: 2
     Type: String
@@ -213,7 +212,7 @@ Parameters:
     AllowedValues:
       - "1TB All Flash"
       - "12TB Hybrid"
-    Description: "1 TB All Flash or 12 TB Hybrid (Flash First architecture with st1 backing disks)."
+    Description: "1TB All Flash or 12TB Hybrid (Flash First architecture with st1 backing disks)"
     Type: String
     Default: "1TB All Flash"
 
@@ -223,16 +222,16 @@ Parameters:
       - m5.4xlarge
       - m5.8xlarge
       - c5n.9xlarge
-    Description: "EC2 instance type for Qumulo nodes. Write/read max throughput in MBs for 1 TB All Flash: m5.2xlarge = 1400/2100, m5.8xlarge = 2000/2500, c5n.9xlarge = 2500/3800.  
-      Write/read max throughput in MBs for 12 TB Hybrid: m5.2xlarge = 800/2100, m5.8xlarge = 1100/2400." 
+    Description: "EC2 instance type for Qumulo nodes. Write/Read Max Throughput in MB/s for 1TB All Flash: m5.2xlarge = 1400/2100, m5.8xlarge = 2000/2500, c5n.9xlarge = 2500/3800.  
+      Write/Read Max Throughput in MB/s for 12TB Hybrid: m5.2xlarge = 800/2100, m5.8xlarge = 1100/2400." 
     Type: String
     Default: "m5.2xlarge"
 
   VolumesEncryptionKey: 
-    Description: The AWS KMS key to encrypt the volumes. Use either a key ID, Amazon Resource Name (ARN), or
-      an alias. Aliases must begin with alias/ followed by the name, such as alias/exampleKey.
-      If empty, the default KMS EBS key is used. Choosing an invalid key name
-      causes the instance to fail to launch.
+    Description: The AWS KMS Key to encrypt the volumes. Use either a key ID, ARN, or
+      an Alias. Aliases must begin with alias/ followed by the name, such as alias/exampleKey.
+      If empty, the default KMS EBS key will be used. Choosing an invalid key name
+      will cause the instance to fail to launch.
     Type: String
 
   QInstanceRecoveryTopic:
@@ -247,20 +246,20 @@ Parameters:
     Default: "10.0.0.0/16"
 
   ProvisioningServerAMI: 
-    Description: Linux server Amazon Machine Image (AMI). 
+    Description: AWS Linux Server AMI
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
   SMBShareName:
     AllowedPattern: '^[0-9a-zA-Z-_]*$'
-    Description: Server Message Block (SMB) share name. 
+    Description: SMB Share Name
     Type: String
     Default: adobe-projects
 
   SideCarTemplate:
-    Description: Do not change unless a newer version of Qumulo is being used.
+    Description: Do not change this unless newer version of Qumulo is being used.
     Type: String
-    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/4.2.0/sidecar_cft.json"
+    Default: "https://qumulo-sidecar-us-east-1.s3.amazonaws.com/3.3.0/sidecar_cft.json"
 
   SideCarUsername:
     Type: String
@@ -268,21 +267,21 @@ Parameters:
 
   SideCarPassword:
     AllowedPattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&\\-_])[A-Za-z\\d@$!%*?&\\-_]{8,}$"
-    Description: "Requires a minimum eight characters and must include one uppercase, one lowercase, and one special character."
+    Description: "Minumum 8 characters and must include one each of: uppercase, lowercase, and a special character."
     MaxLength: 128
     MinLength: 8
     Type: String
     NoEcho: "true"
 
   SideCarSNSTopic:
-    Description: Optionally enter an SNS topic ARN to which Lambda errors and successful disk replacements are published.
+    Description: Optionally enter an SNS topic ARN that lambda errors and successful disk replacements will be published to
     Type: String
     Default: ""
 
   publicRemoteCidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$"
-    Description: "Must be specified as an IPv4 address followed by / and a subnet mask of 0-32. 0.0.0.0/0 (any public source IP can attempt to access the workstation).  
-      If the public source network is not static or is unknown for the clients accessing the workstation, keep the default value of 0.0.0.0/0."
+    Description: "Must be specified as an IPv4 address followed by / and a subnet mask of 0-32. 0.0.0.0/0 = Any Public Source IP may attempt to access the workstation.  
+      If the public source network is not static or is unknown for the client(s) accessing the workstation leave this field at the default of 0.0.0.0/0"
     Type: String
     Default: "0.0.0.0/0"
 
@@ -292,7 +291,7 @@ Parameters:
       - g4dn.4xlarge
       - g4dn.8xlarge
       - g4dn.16xlarge
-    Description: "Adobe editorial personas: 2xlarge = news/simple edit, 4xlarge = creative, 8xlarge = promo."
+    Description: "Adobe Editorial Personas: 2xlarge = News/Simple Edit, 4xlarge = Creative, 8xlarge = Promo"
     Type: String
     Default: "g4dn.2xlarge"
 
@@ -308,17 +307,17 @@ Parameters:
       - "8"
       - "9"
       - "10"
-    Description: "Specify the total number of workstations to build with the instance type."
+    Description: "Specify the total number of workstations to build with the instance type above."
     Type: String
     Default: "1"
 
   DirectoryServerAmi:
-    Description: AWS Windows Server AMI for the domain controller and Active Directory.
+    Description: AWS Windows Server AMI for Domain Controller and Active Directory
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: '/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base'
 
   domainName:
-    Description: Private DNS Fully Qualified Domain Name (FQDN).
+    Description: Private DNS Fully Qualified Domain Name
     AllowedPattern: '[a-zA-Z0-9]+\..+'
     MaxLength: '255'
     MinLength: '2'
@@ -326,7 +325,7 @@ Parameters:
     Default: "studioq.local"
 
   adServiceAccountUsername:
-    Description: User name for the service administrator account.
+    Description: User name for the account that will be added as Service Administrator.
     AllowedPattern: '[a-zA-Z0-9]*'
     MinLength: 5
     MaxLength: 25
@@ -334,7 +333,7 @@ Parameters:
     Default: SvcAdmin
 
   adServiceAccountPassword:
-    Description: Password for the service administrator user. Must be at least eight characters containing letters, numbers, and symbols.
+    Description: Password for the Service Administrator user. Must be at least 8 characters containing letters, numbers and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -342,7 +341,7 @@ Parameters:
     NoEcho: "true"
 
   dcAdminUsername:
-    Description: User name for the domain administrator account. This account is not the same as the default administrator account.
+    Description: User name for the account that will be added as Domain Administrator.  This is separate from the default "Administrator" account.
     AllowedPattern: '[a-zA-Z0-9]*'
     MinLength: 5
     MaxLength: 25
@@ -350,7 +349,7 @@ Parameters:
     Default: administrator
 
   dcAdminPassword:
-    Description: Password for the domain administrator user. Must be at least eight characters containing letters, numbers, and symbols.
+    Description: Password for the Domain Administrator user. Must be at least 8 characters containing letters, numbers and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -358,7 +357,7 @@ Parameters:
     NoEcho: "true"
 
   safeModeAdminPassword:
-    Description: Password for a separate administrator account when the domain controller is in restore mode. Must be at least eight characters containing letters, numbers, and symbols.
+    Description: Password for a separate Administrator account when the domain controller is in Restore Mode. Must be at least 8 characters containing letters, numbers and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -366,7 +365,7 @@ Parameters:
     NoEcho: "true"
 
   testusername:
-    Description: "Base user name for the 20 Active Directory accounts that are created. For example, studioqUser1 through studioqUser20 are created with a base user name of studioqUser."
+    Description: "Base user name for 20 Active Directory accounts that will be created. For example: studioqUser1 through studioqUser20 will be created with a base user name of studioqUser."
     AllowedPattern: '[a-zA-Z0-9]*'
     MinLength: 5
     MaxLength: 25
@@ -374,7 +373,7 @@ Parameters:
     Default: studioqUser
 
   testuserpassword:
-    Description: Default password for the Active Directory accounts that are created. Must be at least eight characters containing letters, numbers, and symbols.
+    Description: Default Password for the Active Directory accounts that will be created. Must be at least 8 characters containing letters, numbers and symbols.
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     MinLength: 8
     MaxLength: 32
@@ -382,7 +381,7 @@ Parameters:
     NoEcho: "true"
 
   qumuloFloatRecordName:
-    Description: Record name for Round Robin DNS entries for Qumulo cluster floating IPs.
+    Description: Record Name for Round Robin DNS entries for Qumulo Cluster floating IPs
     Type: String
     Default: qumulo
 
@@ -461,6 +460,7 @@ Resources:
 
   QSTACK:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: QIAMSTACK
     Properties:
       Parameters:
         ClusterName: !Ref QClusterName
@@ -483,6 +483,7 @@ Resources:
 
   DCSTACK:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: QSTACK
     Properties:
       Parameters:
         DirectoryServerAmi: !Ref DirectoryServerAmi
@@ -516,6 +517,7 @@ Resources:
 
   QSIDECARSTACK:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: DCSTACK
     Properties:
       Parameters:
         SecurityGroup: !GetAtt SECURITYSTACK.Outputs.AllowQumuloSGId
@@ -549,7 +551,7 @@ Resources:
         DomainControllerSecretsArn: !GetAtt SECRETSSTACK.Outputs.DomainControllerSecretsArn
         SideCarSecretsArn: !GetAtt SECRETSSTACK.Outputs.SideCarSecretsArn
         CMK: !Ref VolumesEncryptionKey
-        StackName: !Ref "AWS::StackName"
+        StackName: !Select [0, !Split ["-", !Ref "AWS::StackName"]]
         QStackName: !GetAtt QSTACK.Outputs.AWSStackName
         BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]  
         CMKPolicyPath:
@@ -565,27 +567,25 @@ Resources:
 
   CLOUDWATCHSTACK:
     Type: 'AWS::CloudFormation::Stack'
+    DependsOn: PROVISIONINGSTACK
     Properties:
       Parameters:
-        QClusterName: !Ref QClusterName 
         QStackID: !GetAtt QSTACK.Outputs.AWSStackID
         QStackName: !GetAtt QSTACK.Outputs.AWSStackName
         TopStackName: !Ref AWS::StackName
-        QAuditLog: "NO"
-        Region: !Ref AWS::Region             
         AllFlash: !If
           - 4x5TBHybrid
           - "Hybrid"
           - "AF"
       TemplateURL:
         !Sub
-          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/cloud-watch.cft.yaml
+          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cfn/resource-group.cft.yaml
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       
   WORKSTATIONSTACK:
     Type: "AWS::CloudFormation::Stack"
-    DependsOn: DCSTACK
+    DependsOn: PROVISIONINGSTACK
     Properties:
       Parameters:
         FirstStation: "TRUE"
@@ -619,6 +619,7 @@ Resources:
 
   WORKSTATIONSTACK2:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision2
     Properties:
       Parameters:
@@ -634,6 +635,7 @@ Resources:
 
   WORKSTATIONSTACK3:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision3
     Properties:
       Parameters:
@@ -649,6 +651,7 @@ Resources:
 
   WORKSTATIONSTACK4:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision4
     Properties:
       Parameters:
@@ -664,6 +667,7 @@ Resources:
 
   WORKSTATIONSTACK5:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision5
     Properties:
       Parameters:
@@ -679,6 +683,7 @@ Resources:
 
   WORKSTATIONSTACK6:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision6
     Properties:
       Parameters:
@@ -694,6 +699,7 @@ Resources:
 
   WORKSTATIONSTACK7:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision7
     Properties:
       Parameters:
@@ -709,6 +715,7 @@ Resources:
 
   WORKSTATIONSTACK8:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision8
     Properties:
       Parameters:
@@ -724,6 +731,7 @@ Resources:
 
   WORKSTATIONSTACK9:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Provision9
     Properties:
       Parameters:
@@ -739,6 +747,7 @@ Resources:
 
   WORKSTATIONSTACK10:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: WORKSTATIONSTACK
     Condition: Ten
     Properties:
       Parameters:
@@ -755,62 +764,59 @@ Resources:
 Outputs:
 
   QumuloPrivateIP:
-    Description: Private IP for Qumulo cluster management.
+    Description: Private IP for Qumulo Cluster Management
     Value: !GetAtt QSTACK.Outputs.LinkToManagement
   QumuloTempPassword:
-    Description: Temporary password for Qumulo cluster.
+    Description: Temporary Password for Qumulo Cluster
     Value: !GetAtt QSTACK.Outputs.TemporaryPassword
   QumuloKnowledgeBase:
-    Description: Qumulo knowledge base.
+    Description: Qumulo Knowledge Base
     Value: !GetAtt QSTACK.Outputs.QumuloKnowledgeBase
   WorkstationStackName:
-    Description: Use this stack name for adding new Adobe workstations with the qs-studioq-add-workstation.template.yaml template.
+    Description: Use this StackName to turn up additional Adobe Workstations with the qs-studioq-add-workstation.template.yaml template.
     Value: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationStackName
   TeradiciPCoIPClientURL:
     Description: Use this URL to download the PCoIP client for your Windows/Mac/Linux local machine.
     Value: "https://docs.teradici.com/find/product/software-and-mobile-clients"
   WorkstationPublicIP1:
-    Description: "Public IP for Adobe workstation #1."
+    Description: "Public IP for Adobe Workstation #1"
     Value: !GetAtt WORKSTATIONSTACK.Outputs.GFXWorkstationPublicIP
   WorkstationPublicIP2:
-    Description: "Public IP for Adobe workstation #2."
+    Description: "Public IP for Adobe Workstation #2"
     Value: !GetAtt WORKSTATIONSTACK2.Outputs.GFXWorkstationPublicIP
     Condition: Provision2
   WorkstationPublicIP3:
-    Description: "Public IP for Adobe workstation #3."
+    Description: "Public IP for Adobe Workstation #3"
     Value: !GetAtt WORKSTATIONSTACK3.Outputs.GFXWorkstationPublicIP
     Condition: Provision3
   WorkstationPublicIP4:
-    Description: "Public IP for Adobe workstation #4."
+    Description: "Public IP for Adobe Workstation #4"
     Value: !GetAtt WORKSTATIONSTACK4.Outputs.GFXWorkstationPublicIP
     Condition: Provision4
   WorkstationPublicIP5:
-    Description: "Public IP for Adobe workstation #5."
+    Description: "Public IP for Adobe Workstation #5"
     Value: !GetAtt WORKSTATIONSTACK5.Outputs.GFXWorkstationPublicIP
     Condition: Provision5
   WorkstationPublicIP6:
-    Description: "Public IP for Adobe workstation #6."
+    Description: "Public IP for Adobe Workstation #6"
     Value: !GetAtt WORKSTATIONSTACK6.Outputs.GFXWorkstationPublicIP
     Condition: Provision6
   WorkstationPublicIP7:
-    Description: "Public IP for Adobe workstation #7."
+    Description: "Public IP for Adobe Workstation #7"
     Value: !GetAtt WORKSTATIONSTACK7.Outputs.GFXWorkstationPublicIP
     Condition: Provision7
   WorkstationPublicIP8:
-    Description: "Public IP for Adobe workstation #8."
+    Description: "Public IP for Adobe Workstation #8"
     Value: !GetAtt WORKSTATIONSTACK8.Outputs.GFXWorkstationPublicIP
     Condition: Provision8
   WorkstationPublicIP9:
-    Description: "Public IP for Adobe workstation #9."
+    Description: "Public IP for Adobe Workstation #9"
     Value: !GetAtt WORKSTATIONSTACK9.Outputs.GFXWorkstationPublicIP
     Condition: Provision9
   WorkstationPublicIP10:
-    Description: "Public IP for Adobe workstation #10."
+    Description: "Public IP for Adobe Workstation #10"
     Value: !GetAtt WORKSTATIONSTACK10.Outputs.GFXWorkstationPublicIP
     Condition: Ten
-  Postdeployment:
-    Description: "See the deployment guide for post-deployment steps."
-    Value: "https://fwd.aws/9aNgD?"
 
 
 
