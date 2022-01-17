@@ -69,8 +69,17 @@ while ($status -ne "Running")
 $status = (Get-ADDomainController -Discover -Service "GlobalCatalog" -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
 while ($status -ne "DC")
 {
-  	"AD Server: Checking GlobalCatalog"
+  "AD Server: Checking GlobalCatalog"
 	Start-Sleep 10
 	$status = (Get-ADDomainController -Discover -Service "GlobalCatalog" -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
 }
 "AD Server GlobalCatalog Alive"
+
+$status = (Get-ADComputer dc -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
+while ($status -ne "DC")
+{
+  "AD Server: Checking AD is up"
+  Start-Sleep 10
+  $status = (Get-ADComputer dc -ErrorAction SilentlyContinue | Select -ExpandProperty Name)
+}
+"AD Server is Alive"

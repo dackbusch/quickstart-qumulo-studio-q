@@ -31,9 +31,19 @@ if (-not (Test-Path $PasswordFile))
     Throw "File '$PasswordFile' does not exist, exiting script"
 }
 
+Import-Module ServerManager
+Install-WindowsFeature RSAT-ADDS
 $content = Get-Content $PasswordFile
 $username = $content[0]
 $password = ConvertTo-SecureString $content[1] -AsPlainText -Force
 
-New-AdUser -Name $username -AccountPassword $password -Enabled $True -PasswordNeverExpires $True
+$status = ""
+while ($status -ne "True")
+{
+  "Creating AD Service Account"
+  New-AdUser -Name $username -AccountPassword $password -Enabled $True -PasswordNeverExpires $True
+  Start-Sleep 10  
+  $status = (Get-AdUser -Filter "Name -eq '$username'" -ErrorAction SilentlyContinue | select -ExpandProperty Enabled)  
+}
+
 Add-ADGroupMember -Identity "Domain Admins" -Members $username
