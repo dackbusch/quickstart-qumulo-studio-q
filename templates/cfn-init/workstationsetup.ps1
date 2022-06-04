@@ -291,8 +291,8 @@ Remove-Item $Path\$Installer
 
 "Install 7-Zip"
 $Path = $env:TEMP
-$Installer = "7z1900-x64.msi"
-Invoke-WebRequest "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile $Path\$Installer
+$Installer = "7z2107-x64.msi"
+Invoke-WebRequest "https://www.7-zip.org/a/7z2107-x64.msi" -OutFile $Path\$Installer
 Start-Process msiexec.exe -Wait -ArgumentList "/I $Path\$Installer /quiet" -Verb RunAs
 Remove-Item $Path\$Installer
 
